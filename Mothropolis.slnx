@@ -1,2 +1,4 @@
 ﻿<Solution>
+  <Project Path="Mothropolis.csproj" />
+  <Project Path="Tests.EditMode.csproj" />
 </Solution>
