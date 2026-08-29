@@ -44,19 +44,27 @@ namespace Mothropolis.Night
             
             if (_timeRemaining <= 0)
             {
-                _timeRemaining = 0;
-                _isHunting = false;
-                
-                // Dawn reached! Food is lost.
-                var foodBank = GameServices.Get<FoodBank>();
-                if (foodBank != null) 
-                {
-                    foodBank.LoseCarriedFood();
-                }
-                
-                GameEvents.RaiseDawnReached();
-                Debug.Log("Dawn reached! You stayed out too late. Night failed.");
+                FailNight();
+                Debug.Log("Dawn reached! You stayed out too late.");
             }
+        }
+
+        public void FailNight()
+        {
+            if (!_isHunting) return;
+            
+            _timeRemaining = 0;
+            _isHunting = false;
+            
+            // Dawn reached or Owl caught! Food is lost.
+            var foodBank = GameServices.Get<FoodBank>();
+            if (foodBank != null) 
+            {
+                foodBank.LoseCarriedFood();
+            }
+            
+            GameEvents.RaiseDawnReached();
+            Debug.Log("Night failed.");
         }
 
         private void HandleFoodBanked(int totalBanked)

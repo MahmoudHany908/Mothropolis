@@ -2,7 +2,8 @@
     "name": "Mothropolis",
     "rootNamespace": "Mothropolis",
     "references": [
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
