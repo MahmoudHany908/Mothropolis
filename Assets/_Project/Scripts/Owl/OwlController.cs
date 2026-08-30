@@ -5,10 +5,10 @@ using Mothropolis.Night;
 
 namespace Mothropolis.Owl
 {
+    public enum OwlState { Idle, Charging, Telegraph, Swoop, Recover }
+
     public class OwlController : MonoBehaviour
     {
-        public enum OwlState { Idle, Charging, Telegraph, Swoop, Recover }
-        
         [Header("State (Read Only)")]
         public OwlState currentState = OwlState.Idle;
 

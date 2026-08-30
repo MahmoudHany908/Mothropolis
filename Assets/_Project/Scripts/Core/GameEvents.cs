@@ -15,7 +15,7 @@ namespace Mothropolis.Core
         public static event Action<float> OnExposureChanged;
         public static event Action<int> OnFoodBanked;
         public static event Action<int> OnCarriedFoodChanged;
-        public static event Action<OwlController.OwlState> OnOwlStateChanged;
+        public static event Action<OwlState> OnOwlStateChanged;
         public static event Action<List<MothGenome>, List<MothGenome>> OnGenerationComplete;
         public static event Action OnImmigrantEvent;
 
@@ -26,7 +26,7 @@ namespace Mothropolis.Core
         public static void RaiseExposureChanged(float exposure) => OnExposureChanged?.Invoke(exposure);
         public static void RaiseFoodBanked(int amount) => OnFoodBanked?.Invoke(amount);
         public static void RaiseCarriedFoodChanged(int carriedFood) => OnCarriedFoodChanged?.Invoke(carriedFood);
-        public static void RaiseOwlStateChanged(OwlController.OwlState state) => OnOwlStateChanged?.Invoke(state);
+        public static void RaiseOwlStateChanged(OwlState state) => OnOwlStateChanged?.Invoke(state);
         public static void RaiseGenerationComplete(List<MothGenome> before, List<MothGenome> after) => OnGenerationComplete?.Invoke(before, after);
         public static void RaiseImmigrantEvent() => OnImmigrantEvent?.Invoke();
     }

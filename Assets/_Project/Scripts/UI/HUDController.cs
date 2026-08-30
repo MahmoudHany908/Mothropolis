@@ -130,17 +130,17 @@ namespace Mothropolis.UI
             }
         }
 
-        private void HandleOwlStateChanged(OwlController.OwlState state)
+        private void HandleOwlStateChanged(OwlState state)
         {
             switch (state)
             {
-                case OwlController.OwlState.Charging:
-                case OwlController.OwlState.Telegraph:
-                case OwlController.OwlState.Swoop:
+                case OwlState.Charging:
+                case OwlState.Telegraph:
+                case OwlState.Swoop:
                     SetWarningActive(true);
                     break;
-                case OwlController.OwlState.Idle:
-                case OwlController.OwlState.Recover:
+                case OwlState.Idle:
+                case OwlState.Recover:
                 default:
                     SetWarningActive(false);
                     break;
