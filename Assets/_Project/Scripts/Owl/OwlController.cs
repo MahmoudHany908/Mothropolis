@@ -36,19 +36,63 @@ namespace Mothropolis.Owl
         private void OnEnable()
         {
             GameEvents.OnExposureChanged += HandleExposureChanged;
+            GameEvents.OnNightStarted += HandleNightStarted;
             GameEvents.OnDawnReached += HandleNightEnded;
+            GameEvents.OnFoodBanked += HandleFoodBanked;
         }
 
         private void OnDisable()
         {
             GameEvents.OnExposureChanged -= HandleExposureChanged;
+            GameEvents.OnNightStarted -= HandleNightStarted;
             GameEvents.OnDawnReached -= HandleNightEnded;
+            GameEvents.OnFoodBanked -= HandleFoodBanked;
+        }
+
+        private void HandleNightStarted()
+        {
+            ResetToRoost();
         }
 
         private void HandleNightEnded()
         {
-            if (_stateRoutine != null) StopCoroutine(_stateRoutine);
-            this.enabled = false; // Disable the Owl completely once the night is over
+            ResetToRoost();
+        }
+
+        private void HandleFoodBanked(int amount)
+        {
+            ResetToRoost();
+        }
+
+        public void ResetToRoost()
+        {
+            if (_stateRoutine != null)
+            {
+                StopCoroutine(_stateRoutine);
+                _stateRoutine = null;
+            }
+
+            _currentExposure = 0f;
+            currentState = OwlState.Idle;
+
+            if (startPoint == null)
+            {
+                var startObj = GameObject.Find("OwlStartPoint");
+                if (startObj != null) startPoint = startObj.transform;
+            }
+
+            if (startPoint != null)
+            {
+                transform.position = startPoint.position;
+            }
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("Swoop");
+                animator.ResetTrigger("Telegraph");
+                animator.SetTrigger("ResetToIdle");
+                animator.SetFloat("SwoopProgress", 0f);
+            }
         }
 
         private void Start()
@@ -64,7 +108,7 @@ namespace Mothropolis.Owl
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player != null) _playerTransform = player.transform;
             
-            TransitionTo(OwlState.Idle);
+            ResetToRoost();
         }
 
         private void HandleExposureChanged(float exposureRatio)
@@ -86,8 +130,7 @@ namespace Mothropolis.Owl
             switch (newState)
             {
                 case OwlState.Idle:
-                    if (startPoint != null) transform.position = startPoint.position;
-                    if (animator != null) animator.SetTrigger("ResetToIdle");
+                    ResetToRoost();
                     break;
                 case OwlState.Charging:
                     _stateRoutine = StartCoroutine(ChargingRoutine());
@@ -129,8 +172,6 @@ namespace Mothropolis.Owl
             Debug.Log("[OWL] Telegraphing! SCREECH!");
             if (animator != null) animator.SetTrigger("Telegraph");
             
-            // Here you would play the warning SFX and show a UI indicator (the red exclamation mark)
-            
             yield return new WaitForSeconds(telegraphDuration);
             TransitionTo(OwlState.Swoop);
         }
@@ -140,17 +181,20 @@ namespace Mothropolis.Owl
             Debug.Log("[OWL] SWOOPING!");
             float t = 0f;
             
-            Vector3 p0 = startPoint != null ? startPoint.position : transform.position;
-            // Lock onto where the player is right at the start of the swoop
+            Vector3 p0 = startPoint != null ? startPoint.position : new Vector3(0f, 8f, 0f);
             Vector3 targetPos = _playerTransform != null ? _playerTransform.position : Vector3.zero;
             
-            // p2 is the end point (fly away to the opposite side of the screen, same height as start)
-            Vector3 p2 = targetPos + new Vector3((targetPos.x - p0.x), 0f, 0f);
-            p2.y = p0.y; 
+            // Determine horizontal flight direction (ensure it always flies across and up out of frame)
+            float dx = targetPos.x - p0.x;
+            if (Mathf.Abs(dx) < 2f)
+            {
+                dx = (targetPos.x >= 0) ? 5f : -5f;
+            }
 
-            // We want the curve to pass EXACTLY through targetPos at the halfway point (t = 0.5).
-            // Quadratic Bezier at t=0.5: B(0.5) = 0.25*P0 + 0.5*P1 + 0.25*P2
-            // Solving for P1 (the invisible control point that pulls the curve):
+            // p2 is the exit fly-away point high above the screen on the other side
+            Vector3 p2 = new Vector3(targetPos.x + dx, p0.y, 0f);
+
+            // Calculate quadratic bezier control point P1 so curve passes exactly through targetPos at t=0.5
             Vector3 p1 = 2f * targetPos - 0.5f * (p0 + p2);
 
             // Sprite Flipping Logic
@@ -159,8 +203,6 @@ namespace Mothropolis.Owl
                 float swoopDirectionX = p2.x - p0.x;
                 if (swoopDirectionX != 0)
                 {
-                    // The Owl_Attack sprite naturally faces LEFT.
-                    // So if we are swooping RIGHT (> 0), we must flip the scale to negative!
                     Vector3 scale = spriteVisual.localScale;
                     scale.x = swoopDirectionX > 0 ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
                     spriteVisual.localScale = scale;
@@ -173,16 +215,14 @@ namespace Mothropolis.Owl
             {
                 t += Time.deltaTime / swoopDuration;
                 
-                // Scrub the animation to match the swoop progress EXACTLY
-                if (animator != null) animator.SetFloat("SwoopProgress", t);
+                if (animator != null) animator.SetFloat("SwoopProgress", Mathf.Clamp01(t));
                 
                 // Calculate Quadratic Bezier Position
                 float u = 1f - t;
                 Vector3 currentPos = (u * u * p0) + (2f * u * t * p1) + (t * t * p2);
-                
                 transform.position = currentPos;
 
-                // Hit Detection - expanded strike radius slightly in case of frame-skips
+                // Hit Detection
                 if (_playerTransform != null && Vector3.Distance(transform.position, _playerTransform.position) < strikeRadius)
                 {
                     Debug.Log("[OWL] CAUGHT THE PLAYER! Night Over.");
@@ -192,15 +232,15 @@ namespace Mothropolis.Owl
                     {
                         nightManager.FailNight();
                     }
-                    
-                    TransitionTo(OwlState.Recover);
+
+                    ResetToRoost();
                     yield break;
                 }
 
                 yield return null;
             }
             
-            Debug.Log("[OWL] Missed the player. Flying away.");
+            Debug.Log("[OWL] Missed the player. Flying away off-screen.");
             TransitionTo(OwlState.Recover);
         }
 

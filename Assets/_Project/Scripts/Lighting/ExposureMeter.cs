@@ -15,6 +15,29 @@ namespace Mothropolis.Lighting
         private HashSet<ILightSource> _activeLights = new HashSet<ILightSource>();
         private float _lastLogTime = 0f;
 
+        private void OnEnable()
+        {
+            GameEvents.OnNightStarted += ResetExposure;
+            GameEvents.OnDawnReached += ResetExposure;
+            GameEvents.OnFoodBanked += HandleFoodBanked;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnNightStarted -= ResetExposure;
+            GameEvents.OnDawnReached -= ResetExposure;
+            GameEvents.OnFoodBanked -= HandleFoodBanked;
+        }
+
+        private void HandleFoodBanked(int amount) => ResetExposure();
+
+        public void ResetExposure()
+        {
+            _currentExposure = 0f;
+            _activeLights.Clear();
+            GameEvents.RaiseExposureChanged(0f);
+        }
+
         private void Update()
         {
             float fillRate = 0f;

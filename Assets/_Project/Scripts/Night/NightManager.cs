@@ -29,6 +29,7 @@ namespace Mothropolis.Night
         {
             _timeRemaining = nightDuration;
             _isHunting = true;
+            GameEvents.RaiseNightStarted();
             Debug.Log($"Night started. Time remaining: {_timeRemaining}s");
         }
 
