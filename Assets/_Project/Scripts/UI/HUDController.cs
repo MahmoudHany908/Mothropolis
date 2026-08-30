@@ -12,6 +12,7 @@ namespace Mothropolis.UI
         [Header("UI References")]
         public TMP_Text mothsText;
         public Image owlWarningImage;
+        public Slider exposureSlider;
         public GameObject hudPanel;
 
         [Header("Settings")]
@@ -41,6 +42,21 @@ namespace Mothropolis.UI
                 var warningObj = hudPanel.transform.Find("OwlAttack");
                 if (warningObj != null) owlWarningImage = warningObj.GetComponent<Image>();
             }
+
+            if (exposureSlider == null && hudPanel != null)
+            {
+                var sliderObj = hudPanel.transform.Find("Slider");
+                if (sliderObj != null) exposureSlider = sliderObj.GetComponent<Slider>();
+                if (exposureSlider == null) exposureSlider = hudPanel.GetComponentInChildren<Slider>();
+            }
+
+            if (exposureSlider != null)
+            {
+                exposureSlider.minValue = 0f;
+                exposureSlider.maxValue = 1f;
+                exposureSlider.value = 0f;
+                exposureSlider.interactable = false;
+            }
         }
 
         private void OnEnable()
@@ -51,6 +67,7 @@ namespace Mothropolis.UI
             GameEvents.OnNightStarted += HandleNightStarted;
             GameEvents.OnDawnReached += HandleNightEnded;
             GameEvents.OnOwlStateChanged += HandleOwlStateChanged;
+            GameEvents.OnExposureChanged += HandleExposureChanged;
         }
 
         private void OnDisable()
@@ -61,12 +78,14 @@ namespace Mothropolis.UI
             GameEvents.OnNightStarted -= HandleNightStarted;
             GameEvents.OnDawnReached -= HandleNightEnded;
             GameEvents.OnOwlStateChanged -= HandleOwlStateChanged;
+            GameEvents.OnExposureChanged -= HandleExposureChanged;
         }
 
         private void Start()
         {
             UpdateMothsDisplay(0);
             SetWarningActive(false);
+            if (exposureSlider != null) exposureSlider.value = 0f;
         }
 
         private void HandleMothCaught(Genetics.MothGenome genome)
@@ -86,6 +105,7 @@ namespace Mothropolis.UI
             _currentMoths = 0;
             UpdateMothsDisplay(0);
             SetWarningActive(false);
+            if (exposureSlider != null) exposureSlider.value = 0f;
         }
 
         private void HandleNightStarted()
@@ -93,11 +113,21 @@ namespace Mothropolis.UI
             _currentMoths = 0;
             UpdateMothsDisplay(0);
             SetWarningActive(false);
+            if (exposureSlider != null) exposureSlider.value = 0f;
         }
 
         private void HandleNightEnded()
         {
             SetWarningActive(false);
+            if (exposureSlider != null) exposureSlider.value = 0f;
+        }
+
+        private void HandleExposureChanged(float exposureRatio)
+        {
+            if (exposureSlider != null)
+            {
+                exposureSlider.value = Mathf.Clamp01(exposureRatio);
+            }
         }
 
         private void HandleOwlStateChanged(OwlController.OwlState state)
