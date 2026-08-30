@@ -25,6 +25,16 @@ namespace Mothropolis.Lighting
         private float _timer = 0f;
         private bool _playerInRange = false;
 
+        private void Start()
+        {
+            if (lightVisual == null && transform.childCount > 0)
+            {
+                lightVisual = transform.GetChild(0).gameObject;
+            }
+
+            if (lightVisual != null) lightVisual.SetActive(_isActive);
+        }
+
         private void OnValidate()
         {
             var col = GetComponent<CircleCollider2D>();

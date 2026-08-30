@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &888829793292021784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5814542114135024477}
+  - component: {fileID: 6839075654523197543}
+  - component: {fileID: 8697457698319227954}
+  - component: {fileID: 1803932848584674232}
+  - component: {fileID: 6504994295236893422}
+  - component: {fileID: 7387157563261395529}
+  m_Layer: 0
+  m_Name: GameManagers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5814542114135024477
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6839075654523197543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc1b928fba6aed4ebc9f1533bc1ac0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Economy.FoodBank
+--- !u!114 &8697457698319227954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90dbbf8e0677ca944a6d22aa6d58940c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Night.NightManager
+  nightDuration: 20
+  _timeRemaining: 0
+  _isHunting: 0
+--- !u!114 &1803932848584674232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b04234e27e75343b9e00a57f2fa9fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.GameLoopManager
+  nightManager: {fileID: 0}
+  populationManager: {fileID: 0}
+  playerTransform: {fileID: 0}
+  startPosition: {fileID: 0}
+--- !u!114 &6504994295236893422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eb92dc7a010dab44942a4476803b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.MothPopulationManager
+  config: {fileID: 11400000, guid: 7bac58cbc587d2649a57df05f3832fe1, type: 2}
+  mutationSettings: {fileID: 11400000, guid: 986bc2cc882b43748acfc011e3f4a69a, type: 2}
+  mothPrefab: {fileID: 2057305167139410693, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+--- !u!114 &7387157563261395529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888829793292021784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2420248be4182ba45beeb00cb7c2e873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Moths.RandomAreaSpawner
+  spawnArea: {fileID: 0}
