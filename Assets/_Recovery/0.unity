@@ -362,7 +362,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -2
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c7738730201a1dd4896300ac1223d46e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -654,7 +654,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 7bfaa3b928dbd4a448d7f6c434962d11, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -860,7 +860,6 @@ GameObject:
   - component: {fileID: 612462373}
   - component: {fileID: 612462372}
   - component: {fileID: 612462371}
-  - component: {fileID: 612462374}
   m_Layer: 0
   m_Name: Owl
   m_TagString: Untagged
@@ -883,9 +882,9 @@ MonoBehaviour:
   currentState: 0
   gracePeriod: 1
   telegraphDuration: 1.5
-  swoopDuration: 4
+  swoopDuration: 0.8
   recoverDuration: 2
-  strikeRadius: 0.7
+  strikeRadius: 1.5
   startPoint: {fileID: 1361095366}
   swoopYCurve:
     serializedVersion: 2
@@ -920,8 +919,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  spriteVisual: {fileID: 612462373}
-  animator: {fileID: 612462374}
+  spriteVisual: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!212 &612462372
 SpriteRenderer:
   serializedVersion: 2
@@ -971,8 +970,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2370906388165341055, guid: c6fa14630e3a0e5409c67909c72c0883, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 0.8867924, g: 0.225881, b: 0.225881, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -991,33 +990,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.77368, y: -0.85257, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &612462374
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 612462370}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9493070af14efd946906296ca32163bd, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &630098827
 GameObject:
   m_ObjectHideFlags: 0
@@ -2045,7 +2022,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -2
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c7738730201a1dd4896300ac1223d46e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -54,6 +54,7 @@ namespace Mothropolis.Player
             if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && _isGrounded)
             {
                 _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
+                if (animator != null) animator.SetTrigger("Jump");
             }
 
             // Apply horizontal movement directly
@@ -85,6 +86,7 @@ namespace Mothropolis.Player
                 {
                     animator.SetBool("IsMoving", isMoving);
                     animator.SetBool("IsGrounded", _isGrounded);
+                    animator.SetFloat("VelocityY", _rb.linearVelocity.y);
                 }
 
                 // Sprite Flipping

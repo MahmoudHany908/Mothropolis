@@ -67,8 +67,11 @@ namespace Mothropolis.Moths
             int neighborCount = 0;
             int separationCount = 0;
 
-            // Find all neighbors using the non-allocating Physics2D method
-            int hitCount = Physics2D.OverlapCircleNonAlloc(transform.position, neighborRadius, _neighbors, boidLayer);
+            // Find all neighbors using the modern Unity 6 non-allocating method
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.useLayerMask = true;
+            filter.layerMask = boidLayer;
+            int hitCount = Physics2D.OverlapCircle(transform.position, neighborRadius, filter, _neighbors);
 
             for (int i = 0; i < hitCount; i++)
             {
