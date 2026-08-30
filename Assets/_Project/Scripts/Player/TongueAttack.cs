@@ -29,6 +29,7 @@ namespace Mothropolis.Player
 
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
+                if (GameLoopManager.Instance != null && GameLoopManager.Instance.CurrentState != GameState.Hunting) return;
                 PerformAttack();
             }
         }
@@ -50,6 +51,9 @@ namespace Mothropolis.Player
                 tongueVisual.SetPosition(1, origin + direction * attackRange);
                 _visualTimer = 0.1f;
             }
+
+            // Broadcast attack position so moths can scatter
+            GameEvents.RaiseTongueAttack(origin);
 
             // Raycast to catch moths
             RaycastHit2D hit = Physics2D.Raycast(origin, direction, attackRange, mothLayer);

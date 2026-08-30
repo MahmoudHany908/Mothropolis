@@ -210,6 +210,102 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1509586443}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &94104666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 94104667}
+  m_Layer: 0
+  m_Name: StartPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &94104667
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 94104666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.5, y: -3.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &122021665
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.4225373
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.7865953
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273795969281385190, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1319467393294713978, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: minBounds.y
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1319467393294713978, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: boundaryMargin
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2057305167139410693, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+      propertyPath: m_Name
+      value: Moth
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
 --- !u!1 &198114617
 GameObject:
   m_ObjectHideFlags: 0
@@ -1269,7 +1365,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.335849, b: 0.07418442, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1287,7 +1383,7 @@ Transform:
   m_GameObject: {fileID: 1006927113}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: 0}
+  m_LocalPosition: {x: 0, y: -4.52, z: 0}
   m_LocalScale: {x: 20, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1371,6 +1467,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1016947900}
   m_CullTransparentMesh: 1
+--- !u!1 &1065828941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1065828942}
+  m_Layer: 0
+  m_Name: FixedMothsSpawnPoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1065828942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065828941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.33237, y: 0.54887, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1361095365
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,12 +1675,12 @@ GameObject:
   - component: {fileID: 1509586441}
   - component: {fileID: 1509586440}
   m_Layer: 7
-  m_Name: Moth
+  m_Name: Moth2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1509586440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2189,9 +2316,9 @@ Transform:
   m_GameObject: {fileID: 1904637176}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.138, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -5.17, y: -1.138, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 345010260}
   - {fileID: 630098828}
@@ -2211,6 +2338,84 @@ MonoBehaviour:
   m_EditorClassIdentifier: Mothropolis::Mothropolis.Lighting.ExposureMeter
   maxExposure: 100
   exposureDecayRate: 10
+--- !u!1 &1926866419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1926866421}
+  - component: {fileID: 1926866420}
+  m_Layer: 0
+  m_Name: RandomMothsSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!61 &1926866420
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926866419}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 1.3319407, y: 1.8400004}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 17.669859, y: 5.0095553}
+  m_EdgeRadius: 0
+--- !u!4 &1926866421
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926866419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.33237, y: 0.54887, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1969937197
 GameObject:
   m_ObjectHideFlags: 0
@@ -2222,6 +2427,9 @@ GameObject:
   - component: {fileID: 1969937200}
   - component: {fileID: 1969937199}
   - component: {fileID: 1969937198}
+  - component: {fileID: 1969937203}
+  - component: {fileID: 1969937202}
+  - component: {fileID: 1969937201}
   m_Layer: 0
   m_Name: GameManagers
   m_TagString: Untagged
@@ -2271,6 +2479,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1969937201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1969937197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2420248be4182ba45beeb00cb7c2e873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Moths.RandomAreaSpawner
+  spawnArea: {fileID: 1926866420}
+--- !u!114 &1969937202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1969937197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eb92dc7a010dab44942a4476803b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.MothPopulationManager
+  config: {fileID: 11400000, guid: 7bac58cbc587d2649a57df05f3832fe1, type: 2}
+  mutationSettings: {fileID: 11400000, guid: 986bc2cc882b43748acfc011e3f4a69a, type: 2}
+  mothPrefab: {fileID: 2057305167139410693, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
+--- !u!114 &1969937203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1969937197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b04234e27e75343b9e00a57f2fa9fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.GameLoopManager
+  nightManager: {fileID: 0}
+  populationManager: {fileID: 0}
+  playerTransform: {fileID: 0}
+  startPosition: {fileID: 94104667}
 --- !u!1 &2086686056
 GameObject:
   m_ObjectHideFlags: 0
@@ -2595,3 +2847,7 @@ SceneRoots:
   - {fileID: 1729929687}
   - {fileID: 2117616247}
   - {fileID: 713600261}
+  - {fileID: 1926866421}
+  - {fileID: 1065828942}
+  - {fileID: 94104667}
+  - {fileID: 122021665}

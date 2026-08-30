@@ -67,8 +67,14 @@ namespace Mothropolis.UI
                 reportPanel.SetActive(false);
             }
             
-            Debug.Log("Continuing to Next Generation...");
-            // Day 3 state machine will take over here to run the Reproduction Engine
+            if (GameLoopManager.Instance != null)
+            {
+                GameLoopManager.Instance.TransitionTo(GameState.Reproduce);
+            }
+            else
+            {
+                Debug.LogWarning("No GameLoopManager found to trigger next generation!");
+            }
         }
     }
 }

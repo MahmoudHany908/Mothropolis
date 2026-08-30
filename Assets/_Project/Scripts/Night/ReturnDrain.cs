@@ -34,6 +34,8 @@ namespace Mothropolis.Night
             // wasPressedThisFrame is perfect here so it fires exactly once per press.
             if (Keyboard.current != null && (Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame))
             {
+                if (GameLoopManager.Instance != null && GameLoopManager.Instance.CurrentState != GameState.Hunting) return;
+                
                 var foodBank = GameServices.Get<FoodBank>();
                 if (foodBank == null) return;
 
