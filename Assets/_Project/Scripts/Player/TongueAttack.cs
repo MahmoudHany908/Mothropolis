@@ -20,6 +20,19 @@ namespace Mothropolis.Player
 
         private float _visualTimer = 0f;
 
+        private void Awake()
+        {
+            if (animator == null) animator = GetComponentInChildren<Animator>();
+            if (spriteVisual == null) spriteVisual = transform.Find("Visuals");
+            if (tongueOrigin == null && spriteVisual != null) tongueOrigin = spriteVisual.Find("MouthOrigin");
+            if (tongueSpriteRenderer == null)
+            {
+                var tv = transform.Find("TongueVisual");
+                if (tv != null) tongueSpriteRenderer = tv.GetComponent<SpriteRenderer>();
+            }
+            if (mothLayer.value == 0) mothLayer = LayerMask.GetMask("Moth");
+        }
+
         private void Start()
         {
             if (tongueSpriteRenderer != null)

@@ -29,6 +29,25 @@ namespace Mothropolis.Player
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+            if (groundCheck == null)
+            {
+                var gc = transform.Find("GroundCheck");
+                if (gc != null) groundCheck = gc;
+            }
+            if (spriteVisual == null)
+            {
+                var vis = transform.Find("Visuals");
+                if (vis != null) spriteVisual = vis;
+                else spriteVisual = transform;
+            }
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+            if (groundLayer.value == 0)
+            {
+                groundLayer = LayerMask.GetMask("Ground");
+            }
             if (spriteVisual != null)
             {
                 _visualBaseline = spriteVisual.localPosition;
