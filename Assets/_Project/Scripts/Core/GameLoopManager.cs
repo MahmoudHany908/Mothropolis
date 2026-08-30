@@ -35,6 +35,11 @@ namespace Mothropolis.Core
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null) playerTransform = player.transform;
             }
+            if (startPosition == null)
+            {
+                var startObj = GameObject.Find("StartPosition");
+                if (startObj != null) startPosition = startObj.transform;
+            }
 
             // Start Gen 1
             if (populationManager != null)

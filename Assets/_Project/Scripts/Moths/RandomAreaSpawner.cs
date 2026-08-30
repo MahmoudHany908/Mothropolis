@@ -15,6 +15,12 @@ namespace Mothropolis.Moths
             
             if (spawnArea == null)
             {
+                var spawnerObj = GameObject.Find("RandomMothsSpawner");
+                if (spawnerObj != null) spawnArea = spawnerObj.GetComponent<BoxCollider2D>();
+            }
+
+            if (spawnArea == null)
+            {
                 Debug.LogWarning("[RandomAreaSpawner] No spawn area (BoxCollider2D) assigned!");
                 return;
             }
