@@ -55,6 +55,11 @@ namespace Mothropolis.Owl
         {
             if (spriteVisual == null) spriteVisual = transform;
             if (animator == null) animator = GetComponentInChildren<Animator>();
+            if (startPoint == null)
+            {
+                var startObj = GameObject.Find("OwlStartPoint");
+                if (startObj != null) startPoint = startObj.transform;
+            }
 
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player != null) _playerTransform = player.transform;

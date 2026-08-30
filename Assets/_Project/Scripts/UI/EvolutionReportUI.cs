@@ -14,6 +14,15 @@ namespace Mothropolis.UI
         public TMP_Text statusTitleText; // "Survived!" or "Night Failed"
         public TMP_Text foodBankedText;
 
+        [Header("Buttons")]
+        public UnityEngine.UI.Button continueButton;
+
+        private void Awake()
+        {
+            var canvas = GetComponent<Canvas>();
+            if (canvas != null) canvas.enabled = true;
+        }
+
         private void OnEnable()
         {
             GameEvents.OnFoodBanked += HandleFoodBanked;
@@ -31,6 +40,17 @@ namespace Mothropolis.UI
             if (reportPanel != null)
             {
                 reportPanel.SetActive(false);
+            }
+
+            if (continueButton == null && reportPanel != null)
+            {
+                continueButton = reportPanel.GetComponentInChildren<UnityEngine.UI.Button>(true);
+            }
+
+            if (continueButton != null)
+            {
+                continueButton.onClick.RemoveListener(OnContinueClicked);
+                continueButton.onClick.AddListener(OnContinueClicked);
             }
         }
 
