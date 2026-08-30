@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Mothropolis.Core;
 
 namespace Mothropolis.Moths
 {
@@ -195,8 +196,8 @@ namespace Mothropolis.Moths
         private float _lightCheckTimer = 0f;
         private Lighting.ILightSource _targetLight;
 
-        private void OnEnable() => Core.GameEvents.OnTongueAttack += HandleTongueAttack;
-        private void OnDisable() => Core.GameEvents.OnTongueAttack -= HandleTongueAttack;
+        private void OnEnable() => GameEvents.OnTongueAttack += HandleTongueAttack;
+        private void OnDisable() => GameEvents.OnTongueAttack -= HandleTongueAttack;
 
         private void HandleTongueAttack(Vector2 attackPos)
         {
