@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Night1_Day
   m_EditorClassIdentifier: Mothropolis::Mothropolis.Night.NightConfig
   nightLabel: Night 1
+  sceneName: Level1
   mothPopulation: 24
   spawnMode: 1
   owlAggressionMultiplier: 1

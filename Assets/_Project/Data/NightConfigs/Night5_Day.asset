@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a553963cdb188dc4b8442894df522860, type: 3}
   m_Name: Night5_Day
   m_EditorClassIdentifier: Mothropolis::Mothropolis.Night.NightConfig
-  nightLabel: Night 1
+  nightLabel: Night 5
+  sceneName: Level1
   mothPopulation: 24
-  owlAggressionMultiplier: 1
-  grappleUnlocked: 0
+  spawnMode: 1
+  owlAggressionMultiplier: 1.8
+  grappleUnlocked: 1
   interactiveLightsEnabled: 0

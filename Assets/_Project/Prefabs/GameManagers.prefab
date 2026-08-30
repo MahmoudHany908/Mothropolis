@@ -75,6 +75,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5b04234e27e75343b9e00a57f2fa9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.GameLoopManager
+  nightConfigs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   nightManager: {fileID: 0}
   populationManager: {fileID: 0}
   playerTransform: {fileID: 0}

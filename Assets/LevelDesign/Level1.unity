@@ -3841,113 +3841,6 @@ Transform:
   - {fileID: 1006927116}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1549823615
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1549823621}
-  - component: {fileID: 1549823620}
-  - component: {fileID: 1549823619}
-  - component: {fileID: 1549823618}
-  - component: {fileID: 1549823617}
-  - component: {fileID: 1549823616}
-  m_Layer: 0
-  m_Name: GameManagers (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1549823616
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2420248be4182ba45beeb00cb7c2e873, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mothropolis::Mothropolis.Moths.RandomAreaSpawner
-  spawnArea: {fileID: 954949545}
---- !u!114 &1549823617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1eb92dc7a010dab44942a4476803b52c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.MothPopulationManager
-  config: {fileID: 11400000, guid: 7bac58cbc587d2649a57df05f3832fe1, type: 2}
-  mutationSettings: {fileID: 11400000, guid: 986bc2cc882b43748acfc011e3f4a69a, type: 2}
-  mothPrefab: {fileID: 2057305167139410693, guid: da0143f361f520442b8dfcd2f44bd09b, type: 3}
---- !u!114 &1549823618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5b04234e27e75343b9e00a57f2fa9fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mothropolis::Mothropolis.Core.GameLoopManager
-  nightManager: {fileID: 0}
-  populationManager: {fileID: 0}
-  playerTransform: {fileID: 0}
-  startPosition: {fileID: 868896572}
---- !u!114 &1549823619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90dbbf8e0677ca944a6d22aa6d58940c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mothropolis::Mothropolis.Night.NightManager
-  nightDuration: 20
-  _timeRemaining: 0
-  _isHunting: 0
---- !u!114 &1549823620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbc1b928fba6aed4ebc9f1533bc1ac0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mothropolis::Mothropolis.Economy.FoodBank
---- !u!4 &1549823621
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549823615}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1619339145
 GameObject:
   m_ObjectHideFlags: 0
@@ -5414,6 +5307,71 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c4c423c0ea52d3f4f9a684d1e53e957b, type: 3}
+--- !u!1001 &7276169173674068693
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 888829793292021784, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_Name
+      value: GameManagers
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803932848584674232, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: startPosition
+      value: 
+      objectReference: {fileID: 868896572}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814542114135024477, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7387157563261395529, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
+      propertyPath: spawnArea
+      value: 
+      objectReference: {fileID: 954949545}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: edf6f3e1599cd7a4d804b42d606df3a4, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -5431,7 +5389,7 @@ SceneRoots:
   - {fileID: 1622141557}
   - {fileID: 1000259198}
   - {fileID: 1037509137}
-  - {fileID: 1549823621}
+  - {fileID: 7276169173674068693}
   - {fileID: 954949546}
   - {fileID: 6028292887576535552}
   - {fileID: 181936990083957161}

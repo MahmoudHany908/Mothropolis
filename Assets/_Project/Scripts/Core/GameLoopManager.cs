@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Mothropolis.Night;
 using Mothropolis.Economy;
 
@@ -9,7 +10,12 @@ namespace Mothropolis.Core
     public class GameLoopManager : MonoBehaviour
     {
         public static GameLoopManager Instance { get; private set; }
+        public static int CurrentNightIndex = 0; // 0 for Night 1, 1 for Night 2, etc.
+
         public GameState CurrentState { get; private set; } = GameState.Intro;
+
+        [Header("Campaign Progression")]
+        public NightConfig[] nightConfigs;
 
         [Header("References")]
         public NightManager nightManager;
@@ -21,8 +27,12 @@ namespace Mothropolis.Core
 
         private void Awake()
         {
-            if (Instance != null && Instance != this) Destroy(gameObject);
-            else Instance = this;
+            if (Instance != null && Instance != this) 
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
         }
 
         private void Start()
@@ -41,13 +51,33 @@ namespace Mothropolis.Core
                 if (startObj != null) startPosition = startObj.transform;
             }
 
-            // Start Gen 1
+            // Sync current night config based on CurrentNightIndex
+            ApplyCurrentNightConfig();
+
+            // Initialize or carry over population
             if (populationManager != null)
             {
                 populationManager.InitializeStartingPopulation();
             }
 
             TransitionTo(GameState.Intro);
+        }
+
+        private void ApplyCurrentNightConfig()
+        {
+            if (nightConfigs != null && nightConfigs.Length > 0)
+            {
+                int index = Mathf.Clamp(CurrentNightIndex, 0, nightConfigs.Length - 1);
+                var config = nightConfigs[index];
+                if (config != null)
+                {
+                    if (populationManager != null)
+                    {
+                        populationManager.config = config;
+                    }
+                    Debug.Log($"[GameLoopManager] Active Config: {config.nightLabel} (Scene: {config.sceneName}, Pop: {config.mothPopulation}, Aggression: {config.owlAggressionMultiplier})");
+                }
+            }
         }
 
         private void OnEnable()
@@ -83,8 +113,6 @@ namespace Mothropolis.Core
                         populationManager.SpawnCurrentGeneration();
                     }
                     
-                    // Right now we immediately jump to hunting. 
-                    // In a future sub-phase, we could wait for a UI animation ("Generation X") to finish.
                     TransitionTo(GameState.Hunting);
                     break;
 
@@ -96,7 +124,7 @@ namespace Mothropolis.Core
                     break;
 
                 case GameState.Report:
-                    // Handled automatically by EvolutionReportUI which listens to the same events.
+                    // Handled automatically by EvolutionReportUI
                     break;
 
                 case GameState.Reproduce:
@@ -107,16 +135,49 @@ namespace Mothropolis.Core
                         populationManager.ProcessReproduction(populationManager.CurrentGeneration);
                     }
                     
-                    // Clear the bank for the next night
+                    // Clear carried food for next night
                     var foodBank = GameServices.Get<FoodBank>();
                     if (foodBank != null)
                     {
-                        foodBank.LoseCarriedFood(); // Just in case, though it should be 0
+                        foodBank.LoseCarriedFood();
                     }
 
-                    // Loop back to spawn the next generation
-                    TransitionTo(GameState.Intro);
+                    // Advance Campaign Night Sequence
+                    AdvanceToNextNight();
                     break;
+            }
+        }
+
+        private void AdvanceToNextNight()
+        {
+            CurrentNightIndex++;
+
+            if (nightConfigs != null && CurrentNightIndex < nightConfigs.Length)
+            {
+                var nextConfig = nightConfigs[CurrentNightIndex];
+                string targetScene = !string.IsNullOrEmpty(nextConfig.sceneName) ? nextConfig.sceneName : "Level1";
+                string currentScene = SceneManager.GetActiveScene().name;
+
+                Debug.Log($"[GameLoopManager] Advancing to Night {CurrentNightIndex + 1} ({nextConfig.nightLabel}) -> Target Scene: {targetScene} (Current Scene: {currentScene})");
+
+                if (targetScene != currentScene)
+                {
+                    // Load the designated scene for the next night
+                    SceneManager.LoadScene(targetScene);
+                }
+                else
+                {
+                    // Same scene reused (e.g. Night 4 -> Level2 or Night 5 -> Level1): Apply new night config and restart loop in place
+                    ApplyCurrentNightConfig();
+                    TransitionTo(GameState.Intro);
+                }
+            }
+            else
+            {
+                Debug.Log("[GameLoopManager] ALL 5 NIGHTS COMPLETE! Moth evolution campaign finished successfully.");
+                CurrentNightIndex = 0;
+                ApplyCurrentNightConfig();
+                TransitionTo(GameState.Intro);
             }
         }
 
@@ -134,6 +195,12 @@ namespace Mothropolis.Core
             {
                 TransitionTo(GameState.Report);
             }
+        }
+
+        public static void ResetCampaign()
+        {
+            CurrentNightIndex = 0;
+            MothPopulationManager.ResetCampaign();
         }
     }
 }

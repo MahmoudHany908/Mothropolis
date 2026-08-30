@@ -8,6 +8,7 @@ namespace Mothropolis.Night
     public class NightConfig : ScriptableObject
     {
         public string nightLabel = "Night 1";
+        public string sceneName = "Level1";
         
         [Header("Population")]
         public int mothPopulation = 24;
