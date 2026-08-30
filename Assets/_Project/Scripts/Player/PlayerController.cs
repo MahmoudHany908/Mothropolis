@@ -74,6 +74,7 @@ namespace Mothropolis.Player
             {
                 _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
                 if (animator != null) animator.SetTrigger("Jump");
+                Audio.AudioService.PlayJump();
             }
 
             // Apply horizontal movement directly
