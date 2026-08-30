@@ -33,6 +33,8 @@ namespace Mothropolis.Core
                 return;
             }
             Instance = this;
+
+            EnsureNightConfigs();
         }
 
         private void Start()
@@ -51,6 +53,8 @@ namespace Mothropolis.Core
                 if (startObj != null) startPosition = startObj.transform;
             }
 
+            EnsureNightConfigs();
+
             // Sync current night config based on CurrentNightIndex
             ApplyCurrentNightConfig();
 
@@ -63,8 +67,59 @@ namespace Mothropolis.Core
             TransitionTo(GameState.Intro);
         }
 
+        private void EnsureNightConfigs()
+        {
+            bool needsPopulate = (nightConfigs == null || nightConfigs.Length < 5);
+            if (!needsPopulate)
+            {
+                for (int i = 0; i < nightConfigs.Length; i++)
+                {
+                    if (nightConfigs[i] == null) { needsPopulate = true; break; }
+                }
+            }
+
+            if (needsPopulate)
+            {
+                nightConfigs = new NightConfig[5];
+                nightConfigs[0] = Resources.Load<NightConfig>("NightConfigs/Night1_Day");
+                nightConfigs[1] = Resources.Load<NightConfig>("NightConfigs/Night2_Day");
+                nightConfigs[2] = Resources.Load<NightConfig>("NightConfigs/Night3_Day");
+                nightConfigs[3] = Resources.Load<NightConfig>("NightConfigs/Night4_Day");
+                nightConfigs[4] = Resources.Load<NightConfig>("NightConfigs/Night5_Day");
+
+                // If any are still null, construct fallback runtime instances
+                for (int i = 0; i < 5; i++)
+                {
+                    if (nightConfigs[i] == null)
+                    {
+                        nightConfigs[i] = ScriptableObject.CreateInstance<NightConfig>();
+                        nightConfigs[i].nightLabel = $"Night {i + 1}";
+                        nightConfigs[i].sceneName = GetDefaultSceneForNight(i);
+                        nightConfigs[i].mothPopulation = 24;
+                        nightConfigs[i].spawnMode = SpawnMode.Random;
+                        nightConfigs[i].owlAggressionMultiplier = 1.0f + (i * 0.2f);
+                    }
+                }
+            }
+        }
+
+        public string GetDefaultSceneForNight(int index)
+        {
+            switch (index)
+            {
+                case 0: return "Level1";
+                case 1: return "Level2";
+                case 2: return "Level3";
+                case 3: return "Level2";
+                case 4: return "Level1";
+                default: return "Level1";
+            }
+        }
+
         private void ApplyCurrentNightConfig()
         {
+            EnsureNightConfigs();
+
             if (nightConfigs != null && nightConfigs.Length > 0)
             {
                 int index = Mathf.Clamp(CurrentNightIndex, 0, nightConfigs.Length - 1);
@@ -128,6 +183,9 @@ namespace Mothropolis.Core
                     break;
 
                 case GameState.Reproduce:
+                    // Unpause time
+                    Time.timeScale = 1f;
+
                     // Triggered by the UI Continue button
                     if (populationManager != null)
                     {
@@ -150,15 +208,22 @@ namespace Mothropolis.Core
 
         private void AdvanceToNextNight()
         {
+            EnsureNightConfigs();
+
             CurrentNightIndex++;
 
-            if (nightConfigs != null && CurrentNightIndex < nightConfigs.Length)
+            Time.timeScale = 1f;
+
+            if (CurrentNightIndex < nightConfigs.Length)
             {
                 var nextConfig = nightConfigs[CurrentNightIndex];
-                string targetScene = !string.IsNullOrEmpty(nextConfig.sceneName) ? nextConfig.sceneName : "Level1";
+                string targetScene = (nextConfig != null && !string.IsNullOrEmpty(nextConfig.sceneName))
+                    ? nextConfig.sceneName
+                    : GetDefaultSceneForNight(CurrentNightIndex);
+
                 string currentScene = SceneManager.GetActiveScene().name;
 
-                Debug.Log($"[GameLoopManager] Advancing to Night {CurrentNightIndex + 1} ({nextConfig.nightLabel}) -> Target Scene: {targetScene} (Current Scene: {currentScene})");
+                Debug.Log($"[GameLoopManager] Advancing to Night {CurrentNightIndex + 1} ({nextConfig?.nightLabel}) -> Target Scene: {targetScene} (Current Scene: {currentScene})");
 
                 if (targetScene != currentScene)
                 {
@@ -167,7 +232,7 @@ namespace Mothropolis.Core
                 }
                 else
                 {
-                    // Same scene reused (e.g. Night 4 -> Level2 or Night 5 -> Level1): Apply new night config and restart loop in place
+                    // Same scene reused: Apply new night config and restart loop in place
                     ApplyCurrentNightConfig();
                     TransitionTo(GameState.Intro);
                 }
@@ -176,8 +241,8 @@ namespace Mothropolis.Core
             {
                 Debug.Log("[GameLoopManager] ALL 5 NIGHTS COMPLETE! Moth evolution campaign finished successfully.");
                 CurrentNightIndex = 0;
-                ApplyCurrentNightConfig();
-                TransitionTo(GameState.Intro);
+                MothPopulationManager.ResetCampaign();
+                SceneManager.LoadScene("MainMenu");
             }
         }
 

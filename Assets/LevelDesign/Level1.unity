@@ -5161,6 +5161,14 @@ PrefabInstance:
       propertyPath: 'm_fontSharedMaterials.Array.data[0]'
       value: 
       objectReference: {fileID: 627891849}
+    - target: {fileID: 5617462422583241392, guid: 225274e50b3068546923e0e1a2c0969a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5617462422583241392, guid: 225274e50b3068546923e0e1a2c0969a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6747634385641068809, guid: 225274e50b3068546923e0e1a2c0969a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
