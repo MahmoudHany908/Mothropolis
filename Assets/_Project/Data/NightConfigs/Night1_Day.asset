@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Mothropolis::Mothropolis.Night.NightConfig
   nightLabel: Night 1
   mothPopulation: 24
+  spawnMode: 1
   owlAggressionMultiplier: 1
   grappleUnlocked: 0
   interactiveLightsEnabled: 0

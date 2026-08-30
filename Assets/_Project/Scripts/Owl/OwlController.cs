@@ -25,6 +25,10 @@ namespace Mothropolis.Owl
         public Transform startPoint; // Top corner of the screen
         public AnimationCurve swoopYCurve; // Arc of the swoop (e.g. dips down to 0 and back up)
         
+        [Header("Visuals")]
+        public Transform spriteVisual;
+        public Animator animator;
+
         private float _currentExposure = 0f;
         private Coroutine _stateRoutine;
         private Transform _playerTransform;
@@ -75,6 +79,7 @@ namespace Mothropolis.Owl
             {
                 case OwlState.Idle:
                     if (startPoint != null) transform.position = startPoint.position;
+                    if (animator != null) animator.SetTrigger("ResetToIdle");
                     break;
                 case OwlState.Charging:
                     _stateRoutine = StartCoroutine(ChargingRoutine());
@@ -114,6 +119,7 @@ namespace Mothropolis.Owl
         private IEnumerator TelegraphRoutine()
         {
             Debug.Log("[OWL] Telegraphing! SCREECH!");
+            if (animator != null) animator.SetTrigger("Telegraph");
             
             // Here you would play the warning SFX and show a UI indicator (the red exclamation mark)
             
@@ -139,9 +145,28 @@ namespace Mothropolis.Owl
             // Solving for P1 (the invisible control point that pulls the curve):
             Vector3 p1 = 2f * targetPos - 0.5f * (p0 + p2);
 
+            // Sprite Flipping Logic
+            if (spriteVisual != null)
+            {
+                float swoopDirectionX = p2.x - p0.x;
+                if (swoopDirectionX != 0)
+                {
+                    // The Owl_Attack sprite naturally faces LEFT.
+                    // So if we are swooping RIGHT (> 0), we must flip the scale to negative!
+                    Vector3 scale = spriteVisual.localScale;
+                    scale.x = swoopDirectionX > 0 ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
+                    spriteVisual.localScale = scale;
+                }
+            }
+
+            if (animator != null) animator.SetTrigger("Swoop");
+
             while (t < 1f)
             {
                 t += Time.deltaTime / swoopDuration;
+                
+                // Scrub the animation to match the swoop progress EXACTLY
+                if (animator != null) animator.SetFloat("SwoopProgress", t);
                 
                 // Calculate Quadratic Bezier Position
                 float u = 1f - t;

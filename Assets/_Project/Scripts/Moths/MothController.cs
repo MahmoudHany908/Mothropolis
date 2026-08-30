@@ -59,6 +59,12 @@ namespace Mothropolis.Moths
             }
         }
 
+        public void SetFacingDirection(bool faceLeft)
+        {
+            if (bodyRenderer != null) bodyRenderer.flipX = faceLeft;
+            if (wingsRenderer != null) wingsRenderer.flipX = faceLeft;
+        }
+
         private void Update()
         {
             // Continuous flutter animation in script

@@ -13,11 +13,7 @@ namespace Mothropolis.Night
         [SerializeField] private float _timeRemaining;
         [SerializeField] private bool _isHunting;
 
-        private void Start()
-        {
-            // For Day 1 testing, auto-start the night
-            StartNight();
-        }
+        // Removed Start() as GameLoopManager now calls StartNight() when in Hunting state
 
         private void OnEnable()
         {

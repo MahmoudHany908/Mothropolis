@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Mothropolis.Night
 {
+    public enum SpawnMode { Fixed, Random }
+
     [CreateAssetMenu(fileName = "New NightConfig", menuName = "Mothropolis/Night Config")]
     public class NightConfig : ScriptableObject
     {
@@ -9,6 +11,7 @@ namespace Mothropolis.Night
         
         [Header("Population")]
         public int mothPopulation = 24;
+        public SpawnMode spawnMode = SpawnMode.Random;
         
         [Header("Difficulty")]
         public float owlAggressionMultiplier = 1f;
