@@ -13,17 +13,26 @@ namespace Mothropolis.Economy
         {
             GameServices.Register(this);
             GameEvents.OnMothCaught += HandleMothCaught;
+            GameEvents.OnNightStarted += HandleNightStarted;
         }
 
         private void OnDisable()
         {
             GameEvents.OnMothCaught -= HandleMothCaught;
+            GameEvents.OnNightStarted -= HandleNightStarted;
+        }
+
+        private void HandleNightStarted()
+        {
+            carriedFood = 0;
+            GameEvents.RaiseCarriedFoodChanged(0);
         }
 
         private void HandleMothCaught(MothGenome genome)
         {
             carriedFood++;
             Debug.Log($"Caught moth! Carried Food: {carriedFood}");
+            GameEvents.RaiseCarriedFoodChanged(carriedFood);
         }
 
         public void DepositCarriedFood()
@@ -31,6 +40,7 @@ namespace Mothropolis.Economy
             int deposited = carriedFood;
             bankedFood += carriedFood;
             carriedFood = 0;
+            GameEvents.RaiseCarriedFoodChanged(0);
             
             Debug.Log($"Banked {deposited} food! Total Banked: {bankedFood}");
             
@@ -42,6 +52,7 @@ namespace Mothropolis.Economy
         {
             Debug.Log($"Lost {carriedFood} carried food due to dawn/knockout.");
             carriedFood = 0;
+            GameEvents.RaiseCarriedFoodChanged(0);
         }
     }
 }

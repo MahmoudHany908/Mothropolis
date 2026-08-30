@@ -93,6 +93,8 @@ namespace Mothropolis.Owl
                 animator.SetTrigger("ResetToIdle");
                 animator.SetFloat("SwoopProgress", 0f);
             }
+
+            GameEvents.RaiseOwlStateChanged(OwlState.Idle);
         }
 
         private void Start()
@@ -126,6 +128,7 @@ namespace Mothropolis.Owl
         {
             if (_stateRoutine != null) StopCoroutine(_stateRoutine);
             currentState = newState;
+            GameEvents.RaiseOwlStateChanged(newState);
 
             switch (newState)
             {
