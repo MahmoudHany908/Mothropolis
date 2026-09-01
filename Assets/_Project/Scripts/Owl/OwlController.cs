@@ -15,7 +15,7 @@ namespace Mothropolis.Owl
         [Header("Timing Settings")]
         public float gracePeriod = 1.0f; // Seconds the player can dip back into shadows before owl commits
         public float telegraphDuration = 1.5f; // Warning time before the strike
-        public float swoopDuration = 1.35f; // Speed of the actual attack (tuned for clear readability)
+        public float swoopDuration = 2.3f; // Speed of the actual attack (tuned to 2.3s for generous reaction time)
         public float recoverDuration = 2.0f; // Time before owl can attack again
         
         [Header("Combat Settings")]
@@ -55,7 +55,7 @@ namespace Mothropolis.Owl
             _telegraphRing = ringObj.AddComponent<LineRenderer>();
             _telegraphRing.useWorldSpace = false;
             _telegraphRing.loop = true;
-            _telegraphRing.positionCount = 28;
+            _telegraphRing.positionCount = 32;
             _telegraphRing.startWidth = 0.08f;
             _telegraphRing.endWidth = 0.08f;
             _telegraphRing.sortingOrder = 15; // Above ground tiles
@@ -67,10 +67,10 @@ namespace Mothropolis.Owl
             _telegraphRing.endColor = new Color(1f, 0.1f, 0.15f, 0.9f);
 
             float radius = strikeRadius;
-            for (int i = 0; i < 28; i++)
+            for (int i = 0; i < 32; i++)
             {
-                float angle = i * (Mathf.PI * 2f / 28);
-                _telegraphRing.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius * 0.45f, 0f)); // Elliptical ground target
+                float angle = i * (Mathf.PI * 2f / 32);
+                _telegraphRing.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0f)); // Uniform circular reticle
             }
 
             // Crosshair / Warning Slash
@@ -88,8 +88,8 @@ namespace Mothropolis.Owl
 
             _telegraphCrosshair.SetPosition(0, new Vector3(-radius * 0.7f, 0f, 0f));
             _telegraphCrosshair.SetPosition(1, new Vector3(radius * 0.7f, 0f, 0f));
-            _telegraphCrosshair.SetPosition(2, new Vector3(0f, -radius * 0.35f, 0f));
-            _telegraphCrosshair.SetPosition(3, new Vector3(0f, radius * 0.35f, 0f));
+            _telegraphCrosshair.SetPosition(2, new Vector3(0f, -radius * 0.7f, 0f));
+            _telegraphCrosshair.SetPosition(3, new Vector3(0f, radius * 0.7f, 0f));
 
             _telegraphMarkerObj.SetActive(false);
         }

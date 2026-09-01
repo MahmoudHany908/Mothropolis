@@ -108,7 +108,7 @@ MonoBehaviour:
   currentState: 0
   gracePeriod: 1
   telegraphDuration: 1.5
-  swoopDuration: 1.35
+  swoopDuration: 2.3
   recoverDuration: 2
   strikeRadius: 1.2
   startPoint: {fileID: 0}
