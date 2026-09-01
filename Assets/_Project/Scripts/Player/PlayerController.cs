@@ -21,6 +21,7 @@ namespace Mothropolis.Player
 
         private Rigidbody2D _rb;
         private bool _isGrounded;
+        private bool _wasGrounded;
 
         private void Awake()
         {
@@ -61,6 +62,13 @@ namespace Mothropolis.Player
             {
                 _isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
             }
+
+            // Landing dust puff
+            if (!_wasGrounded && _isGrounded)
+            {
+                VFX.VFXManager.SpawnLandingPuff(groundCheck != null ? groundCheck.position : transform.position);
+            }
+            _wasGrounded = _isGrounded;
 
             if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && _isGrounded)
             {

@@ -57,11 +57,24 @@ namespace Mothropolis.Core
 
         public void InitializeStartingPopulation()
         {
-            // If we already have an active persistent generation carried over from previous night/scene, DO NOT wipe it!
+            // 1. If we already have an active persistent generation in memory, carry it over
             if (PersistentGeneration != null && PersistentGeneration.Count > 0)
             {
                 Debug.Log($"[MothPopulationManager] Carrying over Gen {PersistentGenerationIndex} ({PersistentGeneration.Count} moths) into scene.");
                 return;
+            }
+
+            // 2. If saved campaign data exists on disk, restore it
+            if (CampaignSaveSystem.HasSave())
+            {
+                var save = CampaignSaveSystem.Load();
+                if (save != null && save.population != null && save.population.Count > 0)
+                {
+                    PersistentGeneration = save.population;
+                    PersistentGenerationIndex = save.generationIndex;
+                    Debug.Log($"[MothPopulationManager] Restored Gen {PersistentGenerationIndex} ({PersistentGeneration.Count} moths) from save file.");
+                    return;
+                }
             }
 
             PersistentGeneration = new List<MothGenome>();
@@ -81,8 +94,15 @@ namespace Mothropolis.Core
             Debug.Log($"[MothPopulationManager] Initialized fresh Gen 1 population with {count} moths.");
         }
 
+        public List<MothGenome> InitialNightPopulation { get; private set; }
+
         public void SpawnCurrentGeneration()
         {
+            if (CurrentGeneration != null)
+            {
+                InitialNightPopulation = new List<MothGenome>(CurrentGeneration);
+            }
+
             if (config != null)
             {
                 if (config.spawnMode == SpawnMode.Fixed)

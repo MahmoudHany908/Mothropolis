@@ -122,6 +122,9 @@ namespace Mothropolis.Audio
         private void HandleFoodBanked(int amount) => PlayBankFood();
         private void HandleDawnReached() => PlayOwlCaughtPlayer();
 
+        private Coroutine _duckingRoutine;
+        private float _defaultBgmVolume = 0.35f;
+
         private void HandleOwlStateChanged(OwlState state)
         {
             switch (state)
@@ -129,12 +132,46 @@ namespace Mothropolis.Audio
                 case OwlState.Charging:
                 case OwlState.Telegraph:
                     PlayOwlTelegraph();
+                    DuckBGM(0.12f);
                     break;
                 case OwlState.Swoop:
                     PlayOwlSwoop();
+                    DuckBGM(0.08f);
+                    break;
+                case OwlState.Idle:
+                case OwlState.Recover:
+                default:
+                    RestoreBGM();
                     break;
             }
         }
+
+        private void DuckBGM(float targetVol)
+        {
+            if (_duckingRoutine != null) StopCoroutine(_duckingRoutine);
+            _duckingRoutine = StartCoroutine(FadeBgmVolumeRoutine(targetVol, 0.2f));
+        }
+
+        private void RestoreBGM()
+        {
+            if (_duckingRoutine != null) StopCoroutine(_duckingRoutine);
+            _duckingRoutine = StartCoroutine(FadeBgmVolumeRoutine(_defaultBgmVolume, 0.6f));
+        }
+
+        private IEnumerator FadeBgmVolumeRoutine(float targetVol, float duration)
+        {
+            if (bgmSource == null) yield break;
+            float startVol = bgmSource.volume;
+            for (float t = 0; t < duration; t += Time.unscaledDeltaTime)
+            {
+                bgmSource.volume = Mathf.Lerp(startVol, targetVol, t / duration);
+                yield return null;
+            }
+            bgmSource.volume = targetVol;
+            _duckingRoutine = null;
+        }
+
+        public static void SetMasterVolume(float vol) => AudioListener.volume = Mathf.Clamp01(vol);
 
         private static void PlayClip(AudioClip clip)
         {

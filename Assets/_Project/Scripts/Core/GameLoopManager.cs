@@ -55,6 +55,22 @@ namespace Mothropolis.Core
 
             EnsureNightConfigs();
 
+            // Restore persistent campaign save data if available
+            if (CampaignSaveSystem.HasSave())
+            {
+                var save = CampaignSaveSystem.Load();
+                if (save != null)
+                {
+                    CurrentNightIndex = save.currentNightIndex;
+                    FoodBank.TotalCampaignFood = save.totalCampaignFood;
+                    MothPopulationManager.PersistentGenerationIndex = save.generationIndex;
+                    if (save.population != null && save.population.Count > 0)
+                    {
+                        MothPopulationManager.PersistentGeneration = save.population;
+                    }
+                }
+            }
+
             // Sync current night config based on CurrentNightIndex
             ApplyCurrentNightConfig();
 
@@ -211,7 +227,6 @@ namespace Mothropolis.Core
             EnsureNightConfigs();
 
             CurrentNightIndex++;
-
             Time.timeScale = 1f;
 
             if (CurrentNightIndex < nightConfigs.Length)
@@ -222,27 +237,27 @@ namespace Mothropolis.Core
                     : GetDefaultSceneForNight(CurrentNightIndex);
 
                 string currentScene = SceneManager.GetActiveScene().name;
+                string nightTitle = $"NIGHT {CurrentNightIndex + 1}";
+                string subTitle = $"Location: {targetScene}   |   Generation {MothPopulationManager.PersistentGenerationIndex}";
 
-                Debug.Log($"[GameLoopManager] Advancing to Night {CurrentNightIndex + 1} ({nextConfig?.nightLabel}) -> Target Scene: {targetScene} (Current Scene: {currentScene})");
+                Debug.Log($"[GameLoopManager] Advancing to {nightTitle} -> Target Scene: {targetScene}");
 
-                if (targetScene != currentScene)
+                // Save campaign state before transitioning
+                CampaignSaveSystem.Save(CurrentNightIndex, FoodBank.TotalCampaignFood, MothPopulationManager.PersistentGenerationIndex, MothPopulationManager.PersistentGeneration);
+
+                UI.SceneTransitionFader.LoadNightWithTransition(targetScene, nightTitle, subTitle, () =>
                 {
-                    // Load the designated scene for the next night
-                    SceneManager.LoadScene(targetScene);
-                }
-                else
-                {
-                    // Same scene reused: Apply new night config and restart loop in place
-                    ApplyCurrentNightConfig();
-                    TransitionTo(GameState.Intro);
-                }
+                    if (targetScene == currentScene)
+                    {
+                        ApplyCurrentNightConfig();
+                        TransitionTo(GameState.Intro);
+                    }
+                });
             }
             else
             {
-                Debug.Log("[GameLoopManager] ALL 5 NIGHTS COMPLETE! Moth evolution campaign finished successfully.");
-                CurrentNightIndex = 0;
-                MothPopulationManager.ResetCampaign();
-                SceneManager.LoadScene("MainMenu");
+                Debug.Log($"[GameLoopManager] ALL 5 NIGHTS COMPLETE! Total Food: {FoodBank.TotalCampaignFood}");
+                UI.EndingController.ShowEnding(FoodBank.TotalCampaignFood);
             }
         }
 
@@ -266,6 +281,8 @@ namespace Mothropolis.Core
         {
             CurrentNightIndex = 0;
             MothPopulationManager.ResetCampaign();
+            FoodBank.ResetCampaignFood();
+            CampaignSaveSystem.DeleteSave();
         }
     }
 }

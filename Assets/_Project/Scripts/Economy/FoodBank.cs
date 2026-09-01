@@ -6,6 +6,8 @@ namespace Mothropolis.Economy
 {
     public class FoodBank : MonoBehaviour
     {
+        public static int TotalCampaignFood { get; set; } = 0;
+
         public int carriedFood { get; private set; }
         public int bankedFood { get; private set; }
 
@@ -39,10 +41,11 @@ namespace Mothropolis.Economy
         {
             int deposited = carriedFood;
             bankedFood += carriedFood;
+            TotalCampaignFood += carriedFood;
             carriedFood = 0;
             GameEvents.RaiseCarriedFoodChanged(0);
             
-            Debug.Log($"Banked {deposited} food! Total Banked: {bankedFood}");
+            Debug.Log($"Banked {deposited} food! Total Night Banked: {bankedFood} | Campaign Total: {TotalCampaignFood}");
             
             // This triggers the NightManager to end the night safely
             GameEvents.RaiseFoodBanked(bankedFood);
@@ -53,6 +56,11 @@ namespace Mothropolis.Economy
             Debug.Log($"Lost {carriedFood} carried food due to dawn/knockout.");
             carriedFood = 0;
             GameEvents.RaiseCarriedFoodChanged(0);
+        }
+
+        public static void ResetCampaignFood()
+        {
+            TotalCampaignFood = 0;
         }
     }
 }

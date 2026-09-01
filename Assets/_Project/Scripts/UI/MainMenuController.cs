@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using Mothropolis.Core;
+using Mothropolis.Audio;
 
 namespace Mothropolis.UI
 {
@@ -16,12 +18,17 @@ namespace Mothropolis.UI
         }
 
         [Header("Canvases / Panels")]
-        public GameObject mainMenuPanel;
-        public GameObject slidesPanel;
+        public Canvas mainMenuCanvas;
+        public Canvas slidesCanvas;
 
-        [Header("Buttons")]
+        [Header("Menu Buttons")]
         public Button playButton;
+        public Button exitButton;
+
+        [Header("Slideshow Controls")]
         public Button nextButton;
+        public Button previousButton;
+        public Button skipIntroButton;
 
         [Header("Slides Configuration")]
         public List<SlideItem> slides = new List<SlideItem>();
@@ -31,44 +38,91 @@ namespace Mothropolis.UI
 
         private void Awake()
         {
-            // Auto-detect panels if not assigned
-            if (mainMenuPanel == null)
+            EnsureCanvasScalers();
+            EnsureDirectReferences();
+        }
+
+        private void EnsureCanvasScalers()
+        {
+            var scalers = FindObjectsByType<CanvasScaler>(FindObjectsSortMode.None);
+            foreach (var scaler in scalers)
             {
-                var menuCanvas = GameObject.Find("Canvas");
-                if (menuCanvas != null) mainMenuPanel = menuCanvas;
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1920, 1080);
+                scaler.matchWidthOrHeight = 0.5f;
+            }
+        }
+
+        private void EnsureDirectReferences()
+        {
+            // Direct lookups across active/inactive roots
+            if (mainMenuCanvas == null)
+            {
+                var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+                foreach (var c in canvases)
+                {
+                    if (c.gameObject.scene.isLoaded && (c.name == "Canvas" || c.name.Contains("MainMenu")))
+                    {
+                        mainMenuCanvas = c;
+                        break;
+                    }
+                }
             }
 
-            if (slidesPanel == null)
+            if (slidesCanvas == null)
             {
-                var slidesCanvas = GameObject.Find("SlidesCanvas");
-                if (slidesCanvas != null) slidesPanel = slidesCanvas;
+                var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+                foreach (var c in canvases)
+                {
+                    if (c.gameObject.scene.isLoaded && (c.name == "SlidesCanvas" || c.name.Contains("Slide")))
+                    {
+                        slidesCanvas = c;
+                        break;
+                    }
+                }
             }
 
-            // Auto-detect buttons if not assigned
-            if (playButton == null && mainMenuPanel != null)
+            // Buttons
+            if (mainMenuCanvas != null)
             {
-                playButton = mainMenuPanel.GetComponentInChildren<Button>(true);
+                var allButtons = mainMenuCanvas.GetComponentsInChildren<Button>(true);
+                foreach (var btn in allButtons)
+                {
+                    string n = btn.name.ToLower();
+                    if (playButton == null && (n.Contains("play") || n.Contains("start"))) playButton = btn;
+                    if (exitButton == null && (n.Contains("exit") || n.Contains("quit"))) exitButton = btn;
+                }
+                if (playButton == null && allButtons.Length > 0) playButton = allButtons[0];
             }
 
-            if (nextButton == null && slidesPanel != null)
+            if (slidesCanvas != null)
             {
-                nextButton = slidesPanel.GetComponentInChildren<Button>(true);
-            }
+                var allButtons = slidesCanvas.GetComponentsInChildren<Button>(true);
+                foreach (var btn in allButtons)
+                {
+                    string n = btn.name.ToLower();
+                    if (nextButton == null && (n.Contains("next") || n.Contains("forward"))) nextButton = btn;
+                    if (previousButton == null && (n.Contains("prev") || n.Contains("back"))) previousButton = btn;
+                    if (skipIntroButton == null && n.Contains("skip")) skipIntroButton = btn;
+                }
+                if (nextButton == null && allButtons.Length > 0) nextButton = allButtons[0];
 
-            // Auto-detect slides if empty
-            if (slides.Count == 0 && slidesPanel != null)
-            {
-                AutoPopulateSlides();
+                if (slides.Count == 0)
+                {
+                    AutoPopulateSlides();
+                }
             }
         }
 
         private void AutoPopulateSlides()
         {
             slides.Clear();
+            if (slidesCanvas == null) return;
+
             for (int i = 0; i < 10; i++)
             {
-                var vis = slidesPanel.transform.Find($"Slide{i}");
-                var txt = slidesPanel.transform.Find($"Slide{i}txt");
+                var vis = slidesCanvas.transform.Find($"Slide{i}");
+                var txt = slidesCanvas.transform.Find($"Slide{i}txt");
 
                 if (vis != null || txt != null)
                 {
@@ -87,14 +141,25 @@ namespace Mothropolis.UI
 
         private void Start()
         {
-            // Set initial visibility
-            if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-            if (slidesPanel != null) slidesPanel.SetActive(false);
+            if (mainMenuCanvas != null) mainMenuCanvas.gameObject.SetActive(true);
+            if (slidesCanvas != null) slidesCanvas.gameObject.SetActive(false);
 
             if (playButton != null)
             {
                 playButton.onClick.RemoveListener(OnPlayClicked);
                 playButton.onClick.AddListener(OnPlayClicked);
+
+                // Set keyboard/gamepad focus
+                if (EventSystem.current != null)
+                {
+                    EventSystem.current.SetSelectedGameObject(playButton.gameObject);
+                }
+            }
+
+            if (exitButton != null)
+            {
+                exitButton.onClick.RemoveListener(OnExitClicked);
+                exitButton.onClick.AddListener(OnExitClicked);
             }
 
             if (nextButton != null)
@@ -102,19 +167,49 @@ namespace Mothropolis.UI
                 nextButton.onClick.RemoveListener(OnNextClicked);
                 nextButton.onClick.AddListener(OnNextClicked);
             }
+
+            if (previousButton != null)
+            {
+                previousButton.onClick.RemoveListener(OnPrevClicked);
+                previousButton.onClick.AddListener(OnPrevClicked);
+            }
+
+            if (skipIntroButton != null)
+            {
+                skipIntroButton.onClick.RemoveListener(OnSkipClicked);
+                skipIntroButton.onClick.AddListener(OnSkipClicked);
+            }
         }
 
         public void OnPlayClicked()
         {
-            if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
-            if (slidesPanel != null) slidesPanel.SetActive(true);
+            AudioService.PlayCatchMoth();
+
+            if (mainMenuCanvas != null) mainMenuCanvas.gameObject.SetActive(false);
+            if (slidesCanvas != null) slidesCanvas.gameObject.SetActive(true);
 
             _currentSlideIndex = 0;
             ShowSlide(_currentSlideIndex);
+
+            if (nextButton != null && EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(nextButton.gameObject);
+            }
+        }
+
+        public void OnExitClicked()
+        {
+            AudioService.PlayCatchMoth();
+            Debug.Log("[MainMenuController] Exiting game...");
+            Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
 
         public void OnNextClicked()
         {
+            AudioService.PlayCatchMoth();
             _currentSlideIndex++;
 
             if (_currentSlideIndex < slides.Count)
@@ -123,9 +218,24 @@ namespace Mothropolis.UI
             }
             else
             {
-                // Last slide reached: Launch the game!
                 StartGame();
             }
+        }
+
+        public void OnPrevClicked()
+        {
+            AudioService.PlayCatchMoth();
+            if (_currentSlideIndex > 0)
+            {
+                _currentSlideIndex--;
+                ShowSlide(_currentSlideIndex);
+            }
+        }
+
+        public void OnSkipClicked()
+        {
+            AudioService.PlayBankFood();
+            StartGame();
         }
 
         private void ShowSlide(int index)
@@ -137,19 +247,18 @@ namespace Mothropolis.UI
                 if (slides[i].text != null) slides[i].text.SetActive(isCurrent);
             }
 
-            if (nextButton != null)
+            if (previousButton != null)
             {
-                nextButton.gameObject.SetActive(true);
+                previousButton.gameObject.SetActive(index > 0);
             }
         }
 
         private void StartGame()
         {
-            // Reset campaign progress for a fresh Gen 1 start
             GameLoopManager.ResetCampaign();
 
-            Debug.Log($"[MainMenuController] Starting game -> Loading {firstLevelSceneName}...");
-            SceneManager.LoadScene(firstLevelSceneName);
+            Debug.Log($"[MainMenuController] Starting Campaign -> Night 1 ({firstLevelSceneName})...");
+            SceneTransitionFader.LoadNightWithTransition(firstLevelSceneName, "NIGHT 1: DRAIN ALLEY", "Generation 1 • Fresh Colony");
         }
     }
 }
