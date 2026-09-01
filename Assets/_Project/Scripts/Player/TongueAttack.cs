@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mothropolis.Core;
@@ -10,6 +11,8 @@ namespace Mothropolis.Player
         public float attackRange = 6f;
         [Tooltip("Maximum angle (in degrees) the tongue can fire from the forward facing direction")]
         public float maxAimAngle = 60f; 
+        public float extendSpeed = 35f; // units per second
+        public float retractSpeed = 45f; // units per second
         public LayerMask mothLayer;
         
         [Header("Visuals")]
@@ -18,7 +21,9 @@ namespace Mothropolis.Player
         public Transform tongueOrigin; // Must be child of spriteVisual so it flips position
         public SpriteRenderer tongueSpriteRenderer; // Must NOT be child of spriteVisual, to avoid warping
 
-        private float _visualTimer = 0f;
+        private Coroutine _attackRoutine;
+
+        public bool IsAttacking => _attackRoutine != null;
 
         private void Awake()
         {
@@ -43,21 +48,15 @@ namespace Mothropolis.Player
 
         private void Update()
         {
-            if (_visualTimer > 0)
-            {
-                _visualTimer -= Time.deltaTime;
-                if (_visualTimer <= 0)
-                {
-                    if (tongueSpriteRenderer != null) tongueSpriteRenderer.enabled = false;
-                }
-            }
-
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 if (GameLoopManager.Instance != null && GameLoopManager.Instance.CurrentState != GameState.Hunting) return;
                 
-                // Allow consecutive attacks if visual timer is already running
-                PerformAttack();
+                // Only attack if not already in the middle of a tongue stroke
+                if (!IsAttacking)
+                {
+                    PerformAttack();
+                }
             }
         }
 
@@ -67,7 +66,7 @@ namespace Mothropolis.Player
 
             Vector2 mousePos = Mouse.current.position.ReadValue();
             Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePos);
-            Vector2 origin = tongueOrigin != null ? tongueOrigin.position : transform.position;
+            Vector2 origin = tongueOrigin != null ? (Vector2)tongueOrigin.position : (Vector2)transform.position;
             Vector2 directionToMouse = (worldMousePos - origin).normalized;
             
             // 1. Aim Constraints
@@ -83,57 +82,119 @@ namespace Mothropolis.Player
                 return;
             }
 
-            // 2. Animation Trigger
+            float targetDistance = Mathf.Min(Vector2.Distance(origin, worldMousePos), attackRange);
+
+            if (_attackRoutine != null) StopCoroutine(_attackRoutine);
+            _attackRoutine = StartCoroutine(TongueStrokeRoutine(directionToMouse, targetDistance));
+        }
+
+        private IEnumerator TongueStrokeRoutine(Vector2 direction, float targetDistance)
+        {
+            // 1. Open mouth & raise attack events
             if (animator != null)
             {
+                animator.SetBool("IsAttacking", true);
                 animator.SetTrigger("Attack");
             }
 
-            // 3. Tongue Logic
-            float distance = Vector2.Distance(origin, worldMousePos);
-            distance = Mathf.Min(distance, attackRange);
+            Vector2 origin = tongueOrigin != null ? (Vector2)tongueOrigin.position : (Vector2)transform.position;
+            GameEvents.RaiseTongueAttack(origin);
 
             if (tongueSpriteRenderer != null)
             {
                 tongueSpriteRenderer.enabled = true;
-                
-                // We assume the TongueVisual object is a child of the ROOT frog, NOT the SpriteVisual.
-                // This prevents the parent's negative scale from warping the tongue's rotation.
-                
-                // Set position EXACTLY to the mouth origin (Requires Sprite Pivot = Left)
-                tongueSpriteRenderer.transform.position = origin;
-                
-                // Rotate to point at cursor
-                float angle = Mathf.Atan2(directionToMouse.y, directionToMouse.x) * Mathf.Rad2Deg;
-                tongueSpriteRenderer.transform.rotation = Quaternion.Euler(0, 0, angle);
-                
-                // Calculate the correct scale by dividing by the sprite's actual width
-                float spriteWidth = tongueSpriteRenderer.sprite != null ? tongueSpriteRenderer.sprite.bounds.size.x : 1f;
-                
-                // Account for the parent's scale! If the Frog is scaled down to 0.5, a localScale of 1 only covers 0.5 world units.
-                float parentScaleX = tongueSpriteRenderer.transform.parent != null ? tongueSpriteRenderer.transform.parent.lossyScale.x : 1f;
-                float requiredLocalScaleX = (distance / spriteWidth) / Mathf.Abs(parentScaleX);
-                
-                Vector3 currentScale = tongueSpriteRenderer.transform.localScale;
-                tongueSpriteRenderer.transform.localScale = new Vector3(requiredLocalScaleX, Mathf.Abs(currentScale.y), Mathf.Abs(currentScale.z));
             }
-            
-            _visualTimer = 0.15f;
 
-            // Broadcast attack position so moths can scatter
-            GameEvents.RaiseTongueAttack(origin);
+            float currentDistance = 0f;
+            bool caughtMoth = false;
 
-            // Raycast to catch moths
-            RaycastHit2D hit = Physics2D.Raycast(origin, directionToMouse, distance, mothLayer);
-            if (hit.collider != null)
+            // 2. EXTEND PHASE
+            while (currentDistance < targetDistance)
             {
-                var moth = hit.collider.GetComponent<Moths.MothController>();
-                if (moth != null)
+                currentDistance += extendSpeed * Time.deltaTime;
+                currentDistance = Mathf.Min(currentDistance, targetDistance);
+
+                origin = tongueOrigin != null ? (Vector2)tongueOrigin.position : (Vector2)transform.position;
+                UpdateTongueVisual(origin, direction, currentDistance);
+
+                // Hit Detection while extending
+                if (!caughtMoth)
                 {
-                    Debug.Log($"Caught a moth! Raising OnMothCaught event.");
-                    GameEvents.RaiseMothCaught(moth.Genome);
-                    Destroy(moth.gameObject);
+                    RaycastHit2D hit = Physics2D.Raycast(origin, direction, currentDistance, mothLayer);
+                    if (hit.collider != null)
+                    {
+                        var moth = hit.collider.GetComponent<Moths.MothController>();
+                        if (moth != null)
+                        {
+                            caughtMoth = true;
+                            Debug.Log($"Caught a moth! Raising OnMothCaught event.");
+                            GameEvents.RaiseMothCaught(moth.Genome);
+                            Destroy(moth.gameObject);
+                            break; // Immediately begin retracting upon hitting target
+                        }
+                    }
                 }
+
+                yield return null;
+            }
+
+            // 3. RETRACT PHASE
+            while (currentDistance > 0f)
+            {
+                currentDistance -= retractSpeed * Time.deltaTime;
+                currentDistance = Mathf.Max(currentDistance, 0f);
+
+                origin = tongueOrigin != null ? (Vector2)tongueOrigin.position : (Vector2)transform.position;
+                UpdateTongueVisual(origin, direction, currentDistance);
+
+                yield return null;
+            }
+
+            // 4. RETRACT COMPLETE -> Close mouth
+            if (tongueSpriteRenderer != null)
+            {
+                tongueSpriteRenderer.enabled = false;
+            }
+
+            if (animator != null)
+            {
+                animator.SetBool("IsAttacking", false);
+            }
+
+            _attackRoutine = null;
+        }
+
+        private void UpdateTongueVisual(Vector2 origin, Vector2 direction, float distance)
+        {
+            if (tongueSpriteRenderer == null) return;
+
+            tongueSpriteRenderer.transform.position = origin;
+            
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            tongueSpriteRenderer.transform.rotation = Quaternion.Euler(0, 0, angle);
+
+            float spriteWidth = tongueSpriteRenderer.sprite != null ? tongueSpriteRenderer.sprite.bounds.size.x : 1f;
+            float parentScaleX = tongueSpriteRenderer.transform.parent != null ? tongueSpriteRenderer.transform.parent.lossyScale.x : 1f;
+            float requiredLocalScaleX = (distance / spriteWidth) / Mathf.Abs(parentScaleX);
+
+            Vector3 currentScale = tongueSpriteRenderer.transform.localScale;
+            tongueSpriteRenderer.transform.localScale = new Vector3(requiredLocalScaleX, Mathf.Abs(currentScale.y), Mathf.Abs(currentScale.z));
+        }
+
+        private void OnDisable()
+        {
+            if (_attackRoutine != null)
+            {
+                StopCoroutine(_attackRoutine);
+                _attackRoutine = null;
+            }
+            if (tongueSpriteRenderer != null)
+            {
+                tongueSpriteRenderer.enabled = false;
+            }
+            if (animator != null)
+            {
+                animator.SetBool("IsAttacking", false);
             }
         }
     }

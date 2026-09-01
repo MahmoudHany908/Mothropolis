@@ -18,13 +18,9 @@ namespace Mothropolis.Player
         [Header("Visuals")]
         public Transform spriteVisual; // Ensure this is a child of the Player, not the root!
         public Animator animator;
-        public float hopVisualFrequency = 15f; 
-        public float hopVisualAmplitude = 0.25f;
 
         private Rigidbody2D _rb;
         private bool _isGrounded;
-        private float _hopTime;
-        private Vector3 _visualBaseline;
 
         private void Awake()
         {
@@ -47,10 +43,6 @@ namespace Mothropolis.Player
             if (groundLayer.value == 0)
             {
                 groundLayer = LayerMask.GetMask("Ground");
-            }
-            if (spriteVisual != null)
-            {
-                _visualBaseline = spriteVisual.localPosition;
             }
         }
 
@@ -81,27 +73,12 @@ namespace Mothropolis.Player
             _rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, _rb.linearVelocity.y);
 
             // ==========================================
-            // VISUAL HOPPING (Animator + Code Driven)
+            // VISUAL STATE PASS TO ANIMATOR
             // ==========================================
             if (spriteVisual != null)
             {
                 bool isMoving = Mathf.Abs(horizontalInput) > 0.01f;
                 
-                if (isMoving && _isGrounded)
-                {
-                    _hopTime += Time.deltaTime * hopVisualFrequency;
-                    // Abs(Sin) creates a bouncy arc (0 to 1) so the sprite never dips below the floor
-                    float yOffset = Mathf.Abs(Mathf.Sin(_hopTime)) * hopVisualAmplitude;
-                    spriteVisual.localPosition = _visualBaseline + new Vector3(0, yOffset, 0);
-                }
-                else
-                {
-                    _hopTime = 0f;
-                    // Smoothly settle back to the baseline offset when stopping or jumping
-                    spriteVisual.localPosition = Vector3.Lerp(spriteVisual.localPosition, _visualBaseline, Time.deltaTime * 20f);
-                }
-                
-                // Pass parameters to the Animator for the real animation states
                 if (animator != null)
                 {
                     animator.SetBool("IsMoving", isMoving);
