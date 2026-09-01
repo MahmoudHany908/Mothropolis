@@ -18,8 +18,8 @@ namespace Mothropolis.UI
         }
 
         [Header("Canvases / Panels")]
-        public Canvas mainMenuCanvas;
-        public Canvas slidesCanvas;
+        public GameObject mainMenuPanel;
+        public GameObject slidesPanel;
 
         [Header("Menu Buttons")]
         public Button playButton;
@@ -39,7 +39,7 @@ namespace Mothropolis.UI
         private void Awake()
         {
             EnsureCanvasScalers();
-            EnsureDirectReferences();
+            EnsureReferences();
         }
 
         private void EnsureCanvasScalers()
@@ -53,76 +53,94 @@ namespace Mothropolis.UI
             }
         }
 
-        private void EnsureDirectReferences()
+        private void EnsureReferences()
         {
-            // Direct lookups across active/inactive roots
-            if (mainMenuCanvas == null)
+            // 1. Locate mainMenuPanel
+            if (mainMenuPanel == null)
             {
-                var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-                foreach (var c in canvases)
+                mainMenuPanel = gameObject; // MainMenuController is attached to Canvas
+            }
+
+            // 2. Locate slidesPanel
+            if (slidesPanel == null)
+            {
+                // Search root objects in active scene (finds inactive objects reliably)
+                var roots = SceneManager.GetActiveScene().GetRootGameObjects();
+                foreach (var r in roots)
                 {
-                    if (c.gameObject.scene.isLoaded && (c.name == "Canvas" || c.name.Contains("MainMenu")))
+                    if (r.name == "SlidesCanvas" || r.name.Contains("Slide"))
                     {
-                        mainMenuCanvas = c;
+                        slidesPanel = r;
                         break;
                     }
                 }
             }
 
-            if (slidesCanvas == null)
+            // 3. Locate Buttons on Main Menu
+            if (playButton == null && mainMenuPanel != null)
             {
-                var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-                foreach (var c in canvases)
+                var buttons = mainMenuPanel.GetComponentsInChildren<Button>(true);
+                foreach (var b in buttons)
                 {
-                    if (c.gameObject.scene.isLoaded && (c.name == "SlidesCanvas" || c.name.Contains("Slide")))
+                    string n = b.name.ToLower();
+                    if (n.Contains("play") || n.Contains("start") || n == "button")
                     {
-                        slidesCanvas = c;
+                        playButton = b;
+                        break;
+                    }
+                }
+                if (playButton == null && buttons.Length > 0)
+                {
+                    playButton = buttons[0];
+                }
+            }
+
+            if (exitButton == null && mainMenuPanel != null)
+            {
+                var buttons = mainMenuPanel.GetComponentsInChildren<Button>(true);
+                foreach (var b in buttons)
+                {
+                    string n = b.name.ToLower();
+                    if (n.Contains("exit") || n.Contains("quit"))
+                    {
+                        exitButton = b;
                         break;
                     }
                 }
             }
 
-            // Buttons
-            if (mainMenuCanvas != null)
+            // 4. Locate Next Button on Slides
+            if (nextButton == null && slidesPanel != null)
             {
-                var allButtons = mainMenuCanvas.GetComponentsInChildren<Button>(true);
-                foreach (var btn in allButtons)
+                var buttons = slidesPanel.GetComponentsInChildren<Button>(true);
+                foreach (var b in buttons)
                 {
-                    string n = btn.name.ToLower();
-                    if (playButton == null && (n.Contains("play") || n.Contains("start"))) playButton = btn;
-                    if (exitButton == null && (n.Contains("exit") || n.Contains("quit"))) exitButton = btn;
+                    string n = b.name.ToLower();
+                    if (n.Contains("next") || n == "nextbtn")
+                    {
+                        nextButton = b;
+                        break;
+                    }
                 }
-                if (playButton == null && allButtons.Length > 0) playButton = allButtons[0];
+                if (nextButton == null && buttons.Length > 0)
+                {
+                    nextButton = buttons[0];
+                }
             }
 
-            if (slidesCanvas != null)
-            {
-                var allButtons = slidesCanvas.GetComponentsInChildren<Button>(true);
-                foreach (var btn in allButtons)
-                {
-                    string n = btn.name.ToLower();
-                    if (nextButton == null && (n.Contains("next") || n.Contains("forward"))) nextButton = btn;
-                    if (previousButton == null && (n.Contains("prev") || n.Contains("back"))) previousButton = btn;
-                    if (skipIntroButton == null && n.Contains("skip")) skipIntroButton = btn;
-                }
-                if (nextButton == null && allButtons.Length > 0) nextButton = allButtons[0];
-
-                if (slides.Count == 0)
-                {
-                    AutoPopulateSlides();
-                }
-            }
+            // 5. Populate slides
+            AutoPopulateSlides();
         }
 
         private void AutoPopulateSlides()
         {
             slides.Clear();
-            if (slidesCanvas == null) return;
+            if (slidesPanel == null) return;
 
             for (int i = 0; i < 10; i++)
             {
-                var vis = slidesCanvas.transform.Find($"Slide{i}");
-                var txt = slidesCanvas.transform.Find($"Slide{i}txt");
+                var vis = slidesPanel.transform.Find($"Slide{i}");
+                var txt = slidesPanel.transform.Find($"Slide{i}txt");
 
                 if (vis != null || txt != null)
                 {
@@ -137,23 +155,30 @@ namespace Mothropolis.UI
                     break;
                 }
             }
+            Debug.Log($"[MainMenuController] Registered {slides.Count} story slides.");
         }
 
         private void Start()
         {
-            if (mainMenuCanvas != null) mainMenuCanvas.gameObject.SetActive(true);
-            if (slidesCanvas != null) slidesCanvas.gameObject.SetActive(false);
+            EnsureReferences();
+
+            if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+            if (slidesPanel != null) slidesPanel.SetActive(false);
 
             if (playButton != null)
             {
                 playButton.onClick.RemoveListener(OnPlayClicked);
                 playButton.onClick.AddListener(OnPlayClicked);
 
-                // Set keyboard/gamepad focus
                 if (EventSystem.current != null)
                 {
                     EventSystem.current.SetSelectedGameObject(playButton.gameObject);
                 }
+                Debug.Log($"[MainMenuController] Play button bound: {playButton.name}");
+            }
+            else
+            {
+                Debug.LogWarning("[MainMenuController] Play button not found!");
             }
 
             if (exitButton != null)
@@ -166,6 +191,7 @@ namespace Mothropolis.UI
             {
                 nextButton.onClick.RemoveListener(OnNextClicked);
                 nextButton.onClick.AddListener(OnNextClicked);
+                Debug.Log($"[MainMenuController] Next button bound: {nextButton.name}");
             }
 
             if (previousButton != null)
@@ -183,17 +209,22 @@ namespace Mothropolis.UI
 
         public void OnPlayClicked()
         {
+            Debug.Log("[MainMenuController] Play clicked -> Opening Slideshow...");
             AudioService.PlayCatchMoth();
 
-            if (mainMenuCanvas != null) mainMenuCanvas.gameObject.SetActive(false);
-            if (slidesCanvas != null) slidesCanvas.gameObject.SetActive(true);
+            if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+            if (slidesPanel != null) slidesPanel.SetActive(true);
 
             _currentSlideIndex = 0;
             ShowSlide(_currentSlideIndex);
 
-            if (nextButton != null && EventSystem.current != null)
+            if (nextButton != null)
             {
-                EventSystem.current.SetSelectedGameObject(nextButton.gameObject);
+                nextButton.gameObject.SetActive(true);
+                if (EventSystem.current != null)
+                {
+                    EventSystem.current.SetSelectedGameObject(nextButton.gameObject);
+                }
             }
         }
 
@@ -211,6 +242,7 @@ namespace Mothropolis.UI
         {
             AudioService.PlayCatchMoth();
             _currentSlideIndex++;
+            Debug.Log($"[MainMenuController] Next slide: {_currentSlideIndex} / {slides.Count}");
 
             if (_currentSlideIndex < slides.Count)
             {
@@ -245,6 +277,11 @@ namespace Mothropolis.UI
                 bool isCurrent = (i == index);
                 if (slides[i].visual != null) slides[i].visual.SetActive(isCurrent);
                 if (slides[i].text != null) slides[i].text.SetActive(isCurrent);
+            }
+
+            if (nextButton != null)
+            {
+                nextButton.gameObject.SetActive(true);
             }
 
             if (previousButton != null)
