@@ -15,11 +15,11 @@ namespace Mothropolis.Owl
         [Header("Timing Settings")]
         public float gracePeriod = 1.0f; // Seconds the player can dip back into shadows before owl commits
         public float telegraphDuration = 1.5f; // Warning time before the strike
-        public float swoopDuration = 0.8f; // Speed of the actual attack
+        public float swoopDuration = 1.35f; // Speed of the actual attack (tuned for clear readability)
         public float recoverDuration = 2.0f; // Time before owl can attack again
         
         [Header("Combat Settings")]
-        public float strikeRadius = 1.5f; // Hitbox size
+        public float strikeRadius = 1.2f; // Hitbox size
 
         [Header("Movement Path")]
         public Transform startPoint; // Top corner of the screen
@@ -32,6 +32,67 @@ namespace Mothropolis.Owl
         private float _currentExposure = 0f;
         private Coroutine _stateRoutine;
         private Transform _playerTransform;
+        private Vector3 _lockedTargetPos;
+        private GameObject _telegraphMarkerObj;
+        private LineRenderer _telegraphRing;
+        private LineRenderer _telegraphCrosshair;
+
+        private void Awake()
+        {
+            CreateTelegraphVisual();
+        }
+
+        private void CreateTelegraphVisual()
+        {
+            if (_telegraphMarkerObj != null) return;
+
+            _telegraphMarkerObj = new GameObject("OwlGroundTelegraph");
+            _telegraphMarkerObj.transform.SetParent(null); // World space independent
+
+            // Ring Renderer (Crimson Red Hazard Circle)
+            var ringObj = new GameObject("TelegraphRing");
+            ringObj.transform.SetParent(_telegraphMarkerObj.transform, false);
+            _telegraphRing = ringObj.AddComponent<LineRenderer>();
+            _telegraphRing.useWorldSpace = false;
+            _telegraphRing.loop = true;
+            _telegraphRing.positionCount = 28;
+            _telegraphRing.startWidth = 0.08f;
+            _telegraphRing.endWidth = 0.08f;
+            _telegraphRing.sortingOrder = 15; // Above ground tiles
+
+            // Set unlit material/color
+            Material lineMat = new Material(Shader.Find("Sprites/Default"));
+            _telegraphRing.material = lineMat;
+            _telegraphRing.startColor = new Color(1f, 0.1f, 0.15f, 0.9f);
+            _telegraphRing.endColor = new Color(1f, 0.1f, 0.15f, 0.9f);
+
+            float radius = strikeRadius;
+            for (int i = 0; i < 28; i++)
+            {
+                float angle = i * (Mathf.PI * 2f / 28);
+                _telegraphRing.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius * 0.45f, 0f)); // Elliptical ground target
+            }
+
+            // Crosshair / Warning Slash
+            var crossObj = new GameObject("TelegraphCross");
+            crossObj.transform.SetParent(_telegraphMarkerObj.transform, false);
+            _telegraphCrosshair = crossObj.AddComponent<LineRenderer>();
+            _telegraphCrosshair.useWorldSpace = false;
+            _telegraphCrosshair.material = lineMat;
+            _telegraphCrosshair.positionCount = 4;
+            _telegraphCrosshair.startWidth = 0.06f;
+            _telegraphCrosshair.endWidth = 0.06f;
+            _telegraphCrosshair.sortingOrder = 16;
+            _telegraphCrosshair.startColor = new Color(1f, 0.2f, 0.2f, 0.8f);
+            _telegraphCrosshair.endColor = new Color(1f, 0.2f, 0.2f, 0.8f);
+
+            _telegraphCrosshair.SetPosition(0, new Vector3(-radius * 0.7f, 0f, 0f));
+            _telegraphCrosshair.SetPosition(1, new Vector3(radius * 0.7f, 0f, 0f));
+            _telegraphCrosshair.SetPosition(2, new Vector3(0f, -radius * 0.35f, 0f));
+            _telegraphCrosshair.SetPosition(3, new Vector3(0f, radius * 0.35f, 0f));
+
+            _telegraphMarkerObj.SetActive(false);
+        }
 
         private void OnEnable()
         {
@@ -47,22 +108,14 @@ namespace Mothropolis.Owl
             GameEvents.OnNightStarted -= HandleNightStarted;
             GameEvents.OnDawnReached -= HandleNightEnded;
             GameEvents.OnFoodBanked -= HandleFoodBanked;
+
+            HideTelegraph();
+            if (_telegraphMarkerObj != null) Destroy(_telegraphMarkerObj);
         }
 
-        private void HandleNightStarted()
-        {
-            ResetToRoost();
-        }
-
-        private void HandleNightEnded()
-        {
-            ResetToRoost();
-        }
-
-        private void HandleFoodBanked(int amount)
-        {
-            ResetToRoost();
-        }
+        private void HandleNightStarted() => ResetToRoost();
+        private void HandleNightEnded() => ResetToRoost();
+        private void HandleFoodBanked(int amount) => ResetToRoost();
 
         public void ResetToRoost()
         {
@@ -74,6 +127,7 @@ namespace Mothropolis.Owl
 
             _currentExposure = 0f;
             currentState = OwlState.Idle;
+            HideTelegraph();
 
             if (startPoint == null)
             {
@@ -172,26 +226,81 @@ namespace Mothropolis.Owl
 
         private IEnumerator TelegraphRoutine()
         {
-            Debug.Log("[OWL] Telegraphing! SCREECH!");
+            Debug.Log("[OWL] Telegraphing! SCREECH! Ground hazard marker active.");
             if (animator != null) animator.SetTrigger("Telegraph");
-            
-            yield return new WaitForSeconds(telegraphDuration);
+
+            // Lock in ground strike target position
+            _lockedTargetPos = _playerTransform != null ? _playerTransform.position : transform.position;
+            ShowTelegraph(_lockedTargetPos);
+
+            float timer = 0f;
+            while (timer < telegraphDuration)
+            {
+                timer += Time.deltaTime;
+                
+                // Track player position during the first 0.5s of telegraph, then firmly lock position
+                if (timer < 0.5f && _playerTransform != null)
+                {
+                    _lockedTargetPos = _playerTransform.position;
+                }
+
+                UpdateTelegraphPulse(_lockedTargetPos, timer / telegraphDuration);
+                yield return null;
+            }
+
             TransitionTo(OwlState.Swoop);
+        }
+
+        private void ShowTelegraph(Vector3 targetPos)
+        {
+            if (_telegraphMarkerObj == null) CreateTelegraphVisual();
+            if (_telegraphMarkerObj != null)
+            {
+                _telegraphMarkerObj.transform.position = targetPos;
+                _telegraphMarkerObj.SetActive(true);
+            }
+        }
+
+        private void UpdateTelegraphPulse(Vector3 targetPos, float progress)
+        {
+            if (_telegraphMarkerObj == null || !_telegraphMarkerObj.activeSelf) return;
+
+            _telegraphMarkerObj.transform.position = targetPos;
+
+            // Crimson pulsing frequency increases as strike nears
+            float pulse = 1f + Mathf.Sin(progress * Mathf.PI * 8f) * 0.15f;
+            _telegraphMarkerObj.transform.localScale = Vector3.one * pulse;
+
+            if (_telegraphRing != null)
+            {
+                float alpha = Mathf.Lerp(0.5f, 1f, progress);
+                Color col = new Color(1f, 0.1f, 0.15f, alpha);
+                _telegraphRing.startColor = col;
+                _telegraphRing.endColor = col;
+            }
+        }
+
+        private void HideTelegraph()
+        {
+            if (_telegraphMarkerObj != null)
+            {
+                _telegraphMarkerObj.SetActive(false);
+            }
         }
 
         private IEnumerator SwoopRoutine()
         {
-            Debug.Log("[OWL] SWOOPING!");
+            Debug.Log("[OWL] SWOOPING down to locked target!");
             float t = 0f;
             
             Vector3 p0 = startPoint != null ? startPoint.position : new Vector3(0f, 8f, 0f);
-            Vector3 targetPos = _playerTransform != null ? _playerTransform.position : Vector3.zero;
+            Vector3 targetPos = _lockedTargetPos;
             
-            // Determine horizontal flight direction (ensure it always flies across and up out of frame)
+            // Determine horizontal flight direction (ensure it flies across and up out of frame)
             float dx = targetPos.x - p0.x;
-            if (Mathf.Abs(dx) < 2f)
+            if (Mathf.Abs(dx) < 2.5f)
             {
-                dx = (targetPos.x >= 0) ? 5f : -5f;
+                dx = (targetPos.x >= p0.x) ? 6f : -6f;
             }
 
             // p2 is the exit fly-away point high above the screen on the other side
@@ -225,11 +334,18 @@ namespace Mothropolis.Owl
                 Vector3 currentPos = (u * u * p0) + (2f * u * t * p1) + (t * t * p2);
                 transform.position = currentPos;
 
+                // Hide ground indicator once the owl dives past ground level
+                if (t >= 0.5f)
+                {
+                    HideTelegraph();
+                }
+
                 // Hit Detection
                 if (_playerTransform != null && Vector3.Distance(transform.position, _playerTransform.position) < strikeRadius)
                 {
                     Debug.Log("[OWL] CAUGHT THE PLAYER! Night Over.");
-                    
+                    HideTelegraph();
+
                     var nightManager = FindFirstObjectByType<NightManager>();
                     if (nightManager != null)
                     {
@@ -243,6 +359,7 @@ namespace Mothropolis.Owl
                 yield return null;
             }
             
+            HideTelegraph();
             Debug.Log("[OWL] Missed the player. Flying away off-screen.");
             TransitionTo(OwlState.Recover);
         }
@@ -256,10 +373,10 @@ namespace Mothropolis.Owl
 
         private void OnDrawGizmos()
         {
-            if (currentState == OwlState.Swoop)
+            if (currentState == OwlState.Swoop || currentState == OwlState.Telegraph)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(transform.position, strikeRadius);
+                Gizmos.DrawWireSphere(currentState == OwlState.Telegraph ? _lockedTargetPos : transform.position, strikeRadius);
             }
         }
     }

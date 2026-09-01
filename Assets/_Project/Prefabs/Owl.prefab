@@ -108,9 +108,9 @@ MonoBehaviour:
   currentState: 0
   gracePeriod: 1
   telegraphDuration: 1.5
-  swoopDuration: 0.8
+  swoopDuration: 1.35
   recoverDuration: 2
-  strikeRadius: 0.5
+  strikeRadius: 1.2
   startPoint: {fileID: 0}
   swoopYCurve:
     serializedVersion: 2
