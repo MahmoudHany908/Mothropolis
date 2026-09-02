@@ -15,23 +15,16 @@ namespace Mothropolis.UI
         public GameObject reportPanel;
         
         [Header("Header Text Elements")]
-        public TMP_Text statusTitleText; // e.g. "NIGHT 1 COMPLETE" / "NIGHT SURVIVED!"
-        public TMP_Text subTitleText;    // e.g. "Natural Selection Report"
+        public TMP_Text statusTitleText;
         public TMP_Text foodBankedText;
-        public TMP_Text survivorStatsText; // e.g. "Moths Eaten: 8 / 24 | Survived: 16"
-
-        [Header("Stat Rows (Optional direct bindings)")]
-        public TMP_Text speedStatText;
-        public TMP_Text camoStatText;
-        public TMP_Text lightStatText;
-        public Slider speedBar;
-        public Slider camoBar;
-        public Slider lightBar;
+        public TMP_Text survivorStatsText;
+        public TMP_Text geneticsReportText;
 
         [Header("Buttons")]
         public Button continueButton;
 
         private Coroutine _revealRoutine;
+        private bool _hasClickedContinue = false;
 
         private void Awake()
         {
@@ -51,30 +44,140 @@ namespace Mothropolis.UI
 
             if (reportPanel != null)
             {
-                if (statusTitleText == null)
+                // Reset local scale to 1 to avoid parent scale distortion
+                reportPanel.transform.localScale = Vector3.one;
+
+                var panelRect = reportPanel.GetComponent<RectTransform>();
+                if (panelRect != null)
                 {
-                    var title = reportPanel.transform.Find("Title");
-                    if (title != null) statusTitleText = title.GetComponent<TMP_Text>();
+                    panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+                    panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+                    panelRect.pivot = new Vector2(0.5f, 0.5f);
+                    panelRect.anchoredPosition = Vector2.zero;
+                    panelRect.sizeDelta = new Vector2(980f, 720f);
                 }
 
-                if (foodBankedText == null)
+                var panelImg = reportPanel.GetComponent<Image>();
+                if (panelImg != null)
                 {
-                    var food = reportPanel.transform.Find("FoodCount");
-                    if (food != null) foodBankedText = food.GetComponent<TMP_Text>();
+                    panelImg.color = new Color(0.05f, 0.07f, 0.11f, 0.97f);
                 }
 
-                if (continueButton == null)
+                // 1. Status Title
+                var title = reportPanel.transform.Find("Title");
+                if (title != null)
                 {
-                    var btn = reportPanel.transform.Find("ContinueBtn");
-                    if (btn != null) continueButton = btn.GetComponent<Button>();
-                    if (continueButton == null) continueButton = reportPanel.GetComponentInChildren<Button>(true);
+                    statusTitleText = title.GetComponent<TMP_Text>();
+                    var r = title.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.5f, 0.5f);
+                    r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.anchoredPosition = new Vector2(0f, 270f);
+                    r.sizeDelta = new Vector2(900f, 70f);
+                    if (statusTitleText != null)
+                    {
+                        statusTitleText.fontSize = 38f;
+                        statusTitleText.fontStyle = FontStyles.Bold;
+                        statusTitleText.alignment = TextAlignmentOptions.Center;
+                    }
                 }
 
-                // Look for dynamic or existing stat containers
-                if (survivorStatsText == null)
+                // 2. Food Banked
+                var food = reportPanel.transform.Find("FoodCount");
+                if (food != null)
                 {
-                    var surv = reportPanel.transform.Find("SurvivorStats");
-                    if (surv != null) survivorStatsText = surv.GetComponent<TMP_Text>();
+                    foodBankedText = food.GetComponent<TMP_Text>();
+                    var r = food.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.5f, 0.5f);
+                    r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.anchoredPosition = new Vector2(0f, 195f);
+                    r.sizeDelta = new Vector2(900f, 50f);
+                    if (foodBankedText != null)
+                    {
+                        foodBankedText.fontSize = 28f;
+                        foodBankedText.alignment = TextAlignmentOptions.Center;
+                    }
+                }
+
+                // 3. Survivor Stats
+                var surv = reportPanel.transform.Find("SurvivorStats");
+                if (surv == null)
+                {
+                    var survObj = new GameObject("SurvivorStats");
+                    survObj.transform.SetParent(reportPanel.transform, false);
+                    surv = survObj.transform;
+                    survivorStatsText = survObj.AddComponent<TextMeshProUGUI>();
+                }
+                else
+                {
+                    survivorStatsText = surv.GetComponent<TMP_Text>();
+                }
+                if (survivorStatsText != null)
+                {
+                    var r = surv.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.5f, 0.5f);
+                    r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.anchoredPosition = new Vector2(0f, 130f);
+                    r.sizeDelta = new Vector2(900f, 45f);
+                    survivorStatsText.fontSize = 22f;
+                    survivorStatsText.alignment = TextAlignmentOptions.Center;
+                    survivorStatsText.color = new Color(0.85f, 0.9f, 0.95f);
+                }
+
+                // 4. Genetics Report Body
+                var genObj = reportPanel.transform.Find("GeneticsReport");
+                if (genObj == null)
+                {
+                    var gObj = new GameObject("GeneticsReport");
+                    gObj.transform.SetParent(reportPanel.transform, false);
+                    genObj = gObj.transform;
+                    geneticsReportText = gObj.AddComponent<TextMeshProUGUI>();
+                }
+                else
+                {
+                    geneticsReportText = genObj.GetComponent<TMP_Text>();
+                }
+                if (geneticsReportText != null)
+                {
+                    var r = genObj.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.5f, 0.5f);
+                    r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.anchoredPosition = new Vector2(0f, -10f);
+                    r.sizeDelta = new Vector2(850f, 190f);
+                    geneticsReportText.fontSize = 20f;
+                    geneticsReportText.alignment = TextAlignmentOptions.Center;
+                    geneticsReportText.color = new Color(0.9f, 0.92f, 0.95f);
+                }
+
+                // 5. Continue Button
+                var btn = reportPanel.transform.Find("ContinueBtn");
+                if (btn != null)
+                {
+                    continueButton = btn.GetComponent<Button>();
+                    var r = btn.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.5f, 0.5f);
+                    r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.anchoredPosition = new Vector2(0f, -250f);
+                    r.sizeDelta = new Vector2(320f, 65f);
+
+                    var btnImg = btn.GetComponent<Image>();
+                    if (btnImg != null)
+                    {
+                        btnImg.color = new Color(0.18f, 0.55f, 0.32f, 1f);
+                    }
+
+                    var btnText = btn.GetComponentInChildren<TMP_Text>(true);
+                    if (btnText != null)
+                    {
+                        btnText.text = "CONTINUE";
+                        btnText.fontSize = 24f;
+                        btnText.fontStyle = FontStyles.Bold;
+                        btnText.alignment = TextAlignmentOptions.Center;
+                    }
                 }
             }
         }
@@ -115,8 +218,6 @@ namespace Mothropolis.UI
             ShowReport(false, 0);
         }
 
-        private bool _hasClickedContinue = false;
-
         public void ShowReport(bool survived, int foodBanked)
         {
             _hasClickedContinue = false;
@@ -127,7 +228,6 @@ namespace Mothropolis.UI
                 reportPanel.SetActive(true);
             }
 
-            // Pause physics and simulation while reading the report
             Time.timeScale = 0f;
 
             if (_revealRoutine != null) StopCoroutine(_revealRoutine);
@@ -156,7 +256,7 @@ namespace Mothropolis.UI
             if (statusTitleText != null)
             {
                 statusTitleText.text = titleStr;
-                statusTitleText.color = survived ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.35f, 0.35f);
+                statusTitleText.color = survived ? new Color(0.35f, 1f, 0.45f) : new Color(1f, 0.35f, 0.35f);
             }
 
             if (continueButton != null)
@@ -174,10 +274,10 @@ namespace Mothropolis.UI
             float avgLightBefore = CalculateAverage(initialList, g => g.lightAttraction);
             float avgLightAfter = survivorList.Count > 0 ? CalculateAverage(survivorList, g => g.lightAttraction) : avgLightBefore;
 
-            // 1. Tally Food & Survivor counts
+            // 1. Tally Food
             if (foodBankedText != null)
             {
-                foodBankedText.text = $"Food Banked: 0";
+                foodBankedText.text = "Food Banked: 0";
             }
 
             yield return new WaitForSecondsRealtime(0.2f);
@@ -187,38 +287,42 @@ namespace Mothropolis.UI
             while (displayFood < targetFood)
             {
                 displayFood++;
-                if (foodBankedText != null) foodBankedText.text = $"Food Banked: +{displayFood}";
+                if (foodBankedText != null) foodBankedText.text = $"Food Banked: <color=#FFD54F>+{displayFood}</color>";
                 AudioService.PlayCatchMoth();
                 yield return new WaitForSecondsRealtime(0.04f);
             }
             if (foodBankedText != null)
             {
-                foodBankedText.text = survived ? $"Food Banked: +{targetFood}" : "Food Lost (Caught by Owl or Dawn)";
+                foodBankedText.text = survived ? $"Food Banked: <color=#81C784>+{targetFood}</color>" : "<color=#EF5350>Food Lost to Predator / Dawn</color>";
             }
 
             yield return new WaitForSecondsRealtime(0.15f);
 
             // 2. Survivor Details
-            string summaryDetails = $"Moths Eaten: <color=#FFD54F>{eatenCount}</color> / {initialCount}   |   Survivors: <color=#81C784>{survivorCount}</color>\n\n" +
-                                   $"<b><size=115%>GENETIC SELECTION SHIFTS</size></b>\n" +
-                                   FormatTraitRow("Speed", avgSpeedBefore, avgSpeedAfter) + "\n" +
-                                   FormatTraitRow("Camouflage", avgCamoBefore, avgCamoAfter) + "\n" +
-                                   FormatTraitRow("Light Attraction", avgLightBefore, avgLightAfter);
-
             if (survivorStatsText != null)
             {
-                survivorStatsText.text = summaryDetails;
+                survivorStatsText.text = $"Moths Harvested: <color=#FFD54F><b>{eatenCount}</b></color> / {initialCount}    |    Survivors: <color=#81C784><b>{survivorCount}</b></color>";
             }
-            else if (foodBankedText != null)
+
+            // 3. Genetics Breakdown Box
+            string shiftsTable = $"<b><size=115%>NATURAL SELECTION SHIFTS</size></b>\n\n" +
+                                 FormatTraitRow("Speed", avgSpeedBefore, avgSpeedAfter) + "\n" +
+                                 FormatTraitRow("Camouflage", avgCamoBefore, avgCamoAfter) + "\n" +
+                                 FormatTraitRow("Light Attraction", avgLightBefore, avgLightAfter);
+
+            if (geneticsReportText != null)
             {
-                // Fallback: Append directly to details if secondary text block isn't present
-                foodBankedText.text = (survived ? $"Food Banked: +{targetFood}\n\n" : "Food Lost to Predator/Dawn\n\n") + summaryDetails;
+                geneticsReportText.text = shiftsTable;
+            }
+            else if (foodBankedText != null && survivorStatsText == null)
+            {
+                foodBankedText.text += "\n\n" + shiftsTable;
             }
 
             AudioService.PlayBankFood();
             yield return new WaitForSecondsRealtime(0.3f);
 
-            // 3. Reveal Continue Button
+            // 4. Reveal Continue Button
             if (continueButton != null)
             {
                 continueButton.gameObject.SetActive(true);
@@ -237,7 +341,7 @@ namespace Mothropolis.UI
             string colorHex = delta > 0 ? "#81C784" : (delta < 0 ? "#E57373" : "#B0BEC5");
             string sign = delta > 0 ? "+" : "";
 
-            return $"• {traitName,-16}: {beforePct}% → <b>{afterPct}%</b> <color={colorHex}>({sign}{delta}% {arrow})</color>";
+            return $"• {traitName,-16}: {beforePct}% → <b>{afterPct}%</b>  <color={colorHex}>({sign}{delta}% {arrow})</color>";
         }
 
         private float CalculateAverage(List<MothGenome> list, System.Func<MothGenome, float> selector)
