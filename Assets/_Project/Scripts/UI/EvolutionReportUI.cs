@@ -32,6 +32,12 @@ namespace Mothropolis.UI
             if (canvas != null) canvas.enabled = true;
 
             EnsureUIHierarchy();
+
+            // Guarantee report panel is completely hidden on level load
+            if (reportPanel != null)
+            {
+                reportPanel.SetActive(false);
+            }
         }
 
         private void EnsureUIHierarchy()
@@ -44,7 +50,6 @@ namespace Mothropolis.UI
 
             if (reportPanel != null)
             {
-                // Reset local scale to 1 to avoid parent scale distortion
                 reportPanel.transform.localScale = Vector3.one;
 
                 var panelRect = reportPanel.GetComponent<RectTransform>();
@@ -54,31 +59,33 @@ namespace Mothropolis.UI
                     panelRect.anchorMax = new Vector2(0.5f, 0.5f);
                     panelRect.pivot = new Vector2(0.5f, 0.5f);
                     panelRect.anchoredPosition = Vector2.zero;
-                    panelRect.sizeDelta = new Vector2(980f, 720f);
+                    panelRect.sizeDelta = new Vector2(900f, 620f);
                 }
 
                 var panelImg = reportPanel.GetComponent<Image>();
                 if (panelImg != null)
                 {
-                    panelImg.color = new Color(0.05f, 0.07f, 0.11f, 0.97f);
+                    panelImg.color = new Color(0.05f, 0.07f, 0.11f, 0.96f);
                 }
 
                 // 1. Status Title
                 var title = reportPanel.transform.Find("Title");
                 if (title != null)
                 {
+                    title.transform.localScale = Vector3.one;
                     statusTitleText = title.GetComponent<TMP_Text>();
                     var r = title.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.5f, 0.5f);
                     r.anchorMax = new Vector2(0.5f, 0.5f);
                     r.pivot = new Vector2(0.5f, 0.5f);
-                    r.anchoredPosition = new Vector2(0f, 270f);
-                    r.sizeDelta = new Vector2(900f, 70f);
+                    r.anchoredPosition = new Vector2(0f, 230f);
+                    r.sizeDelta = new Vector2(850f, 60f);
                     if (statusTitleText != null)
                     {
-                        statusTitleText.fontSize = 38f;
+                        statusTitleText.fontSize = 32f;
                         statusTitleText.fontStyle = FontStyles.Bold;
                         statusTitleText.alignment = TextAlignmentOptions.Center;
+                        statusTitleText.text = "";
                     }
                 }
 
@@ -86,17 +93,19 @@ namespace Mothropolis.UI
                 var food = reportPanel.transform.Find("FoodCount");
                 if (food != null)
                 {
+                    food.transform.localScale = Vector3.one;
                     foodBankedText = food.GetComponent<TMP_Text>();
                     var r = food.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.5f, 0.5f);
                     r.anchorMax = new Vector2(0.5f, 0.5f);
                     r.pivot = new Vector2(0.5f, 0.5f);
-                    r.anchoredPosition = new Vector2(0f, 195f);
-                    r.sizeDelta = new Vector2(900f, 50f);
+                    r.anchoredPosition = new Vector2(0f, 165f);
+                    r.sizeDelta = new Vector2(850f, 45f);
                     if (foodBankedText != null)
                     {
-                        foodBankedText.fontSize = 28f;
+                        foodBankedText.fontSize = 24f;
                         foodBankedText.alignment = TextAlignmentOptions.Center;
+                        foodBankedText.text = "";
                     }
                 }
 
@@ -115,15 +124,17 @@ namespace Mothropolis.UI
                 }
                 if (survivorStatsText != null)
                 {
+                    surv.transform.localScale = Vector3.one;
                     var r = surv.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.5f, 0.5f);
                     r.anchorMax = new Vector2(0.5f, 0.5f);
                     r.pivot = new Vector2(0.5f, 0.5f);
-                    r.anchoredPosition = new Vector2(0f, 130f);
-                    r.sizeDelta = new Vector2(900f, 45f);
-                    survivorStatsText.fontSize = 22f;
+                    r.anchoredPosition = new Vector2(0f, 110f);
+                    r.sizeDelta = new Vector2(850f, 40f);
+                    survivorStatsText.fontSize = 19f;
                     survivorStatsText.alignment = TextAlignmentOptions.Center;
                     survivorStatsText.color = new Color(0.85f, 0.9f, 0.95f);
+                    survivorStatsText.text = "";
                 }
 
                 // 4. Genetics Report Body
@@ -141,28 +152,31 @@ namespace Mothropolis.UI
                 }
                 if (geneticsReportText != null)
                 {
+                    genObj.transform.localScale = Vector3.one;
                     var r = genObj.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.5f, 0.5f);
                     r.anchorMax = new Vector2(0.5f, 0.5f);
                     r.pivot = new Vector2(0.5f, 0.5f);
-                    r.anchoredPosition = new Vector2(0f, -10f);
-                    r.sizeDelta = new Vector2(850f, 190f);
-                    geneticsReportText.fontSize = 20f;
+                    r.anchoredPosition = new Vector2(0f, -20f);
+                    r.sizeDelta = new Vector2(850f, 180f);
+                    geneticsReportText.fontSize = 18f;
                     geneticsReportText.alignment = TextAlignmentOptions.Center;
                     geneticsReportText.color = new Color(0.9f, 0.92f, 0.95f);
+                    geneticsReportText.text = "";
                 }
 
                 // 5. Continue Button
                 var btn = reportPanel.transform.Find("ContinueBtn");
                 if (btn != null)
                 {
+                    btn.transform.localScale = Vector3.one;
                     continueButton = btn.GetComponent<Button>();
                     var r = btn.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.5f, 0.5f);
                     r.anchorMax = new Vector2(0.5f, 0.5f);
                     r.pivot = new Vector2(0.5f, 0.5f);
-                    r.anchoredPosition = new Vector2(0f, -250f);
-                    r.sizeDelta = new Vector2(320f, 65f);
+                    r.anchoredPosition = new Vector2(0f, -220f);
+                    r.sizeDelta = new Vector2(240f, 50f);
 
                     var btnImg = btn.GetComponent<Image>();
                     if (btnImg != null)
@@ -174,7 +188,7 @@ namespace Mothropolis.UI
                     if (btnText != null)
                     {
                         btnText.text = "CONTINUE";
-                        btnText.fontSize = 24f;
+                        btnText.fontSize = 20f;
                         btnText.fontStyle = FontStyles.Bold;
                         btnText.alignment = TextAlignmentOptions.Center;
                     }
