@@ -115,8 +115,11 @@ namespace Mothropolis.UI
             ShowReport(false, 0);
         }
 
+        private bool _hasClickedContinue = false;
+
         public void ShowReport(bool survived, int foodBanked)
         {
+            _hasClickedContinue = false;
             EnsureUIHierarchy();
 
             if (reportPanel != null)
@@ -250,6 +253,9 @@ namespace Mothropolis.UI
 
         public void OnContinueClicked()
         {
+            if (_hasClickedContinue) return;
+            _hasClickedContinue = true;
+
             Time.timeScale = 1f;
             if (reportPanel != null)
             {

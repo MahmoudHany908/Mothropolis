@@ -163,14 +163,19 @@ namespace Mothropolis.Core
             GameEvents.OnFoodBanked -= HandleFoodBanked;
         }
 
+        private bool _isAdvancingNight = false;
+
         public void TransitionTo(GameState newState)
         {
+            if (CurrentState == newState && newState != GameState.Intro) return;
             CurrentState = newState;
             Debug.Log($"[GameLoopManager] Transitioned to {newState}");
 
             switch (newState)
             {
                 case GameState.Intro:
+                    _isAdvancingNight = false;
+
                     // Reset player to the start of the level
                     if (playerTransform != null && startPosition != null)
                     {
@@ -199,6 +204,9 @@ namespace Mothropolis.Core
                     break;
 
                 case GameState.Reproduce:
+                    if (_isAdvancingNight) return;
+                    _isAdvancingNight = true;
+
                     // Unpause time
                     Time.timeScale = 1f;
 
@@ -247,6 +255,7 @@ namespace Mothropolis.Core
 
                 UI.SceneTransitionFader.LoadNightWithTransition(targetScene, nightTitle, subTitle, () =>
                 {
+                    _isAdvancingNight = false;
                     if (targetScene == currentScene)
                     {
                         ApplyCurrentNightConfig();
